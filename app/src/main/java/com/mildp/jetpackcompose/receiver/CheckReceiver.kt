@@ -1,0 +1,71 @@
+package com.mildp.jetpackcompose.receiver
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.mildp.jetpackcompose.R
+import com.mildp.jetpackcompose.utils.Helper
+
+class CheckReceiver : BroadcastReceiver() {
+
+    private lateinit var checkManager: NotificationManager
+    companion object {
+        private const val TAG: String = "CheckReceiver"
+        private const val CHANNEL_ID = "CheckStatusChannel"
+        private const val NOTIFICATION_ID_BLUETOOTH = 24
+        private const val NOTIFICATION_ID_GPS = 25
+        private const val NOTIFICATION_ID_USAGE = 26
+        private const val NOTIFICATION_ID_ACCESSIBILITY = 27
+        private const val NOTIFICATION_ID_NOTIFICATION_PERMISSION = 28
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+
+        checkManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        createNotificationChannel()
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setContentTitle("您有尚未打開的設備，請您檢查以下功能是否開啟")
+            .setSmallIcon(R.drawable.warning_hint_notification)
+
+        when (intent.action) {
+            "GPS" -> {
+                notification.setContentText("由於實驗需求，盼請您開啟GPS，以求資料完整。重新設定後可以直接滑掉此通知。")
+                checkManager.notify(NOTIFICATION_ID_GPS, notification.build())
+                Helper().log(TAG, "未打開GPS")
+            }
+            "BlueTooth" -> {
+                notification.setContentText("由於實驗需求，盼請您開啟藍芽，以求資料完整。重新設定後可以直接滑掉此通知")
+                checkManager.notify(NOTIFICATION_ID_BLUETOOTH, notification.build())
+                Helper().log(TAG, "未打開藍芽")
+            }
+            "Usage_Permission" -> {
+                notification.setContentText("您的權限可能被系統關閉，盼請您開啟應用程式設定。重新設定後可以直接滑掉此通知")
+                checkManager.notify(NOTIFICATION_ID_USAGE, notification.build())
+                Helper().log(TAG, "未打開應用程式設定")
+            }
+            "Accessibility_Permission" -> {
+                notification.setContentText("您的權限可能被系統關閉，盼請您開啟應用程式設定。重新設定後可以直接滑掉此通知")
+                checkManager.notify(NOTIFICATION_ID_ACCESSIBILITY, notification.build())
+                Helper().log(TAG, "未打開無障礙設定")
+            }
+            "Notification_Permission" -> {
+                notification.setContentText("您的權限可能被系統關閉，盼請您開啟應用程式設定。重新設定後可以直接滑掉此通知")
+                checkManager.notify(NOTIFICATION_ID_NOTIFICATION_PERMISSION, notification.build())
+                Helper().log(TAG, "未打開通知設定")
+            }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel =
+                NotificationChannel(CHANNEL_ID, "CheckStatus", NotificationManager.IMPORTANCE_HIGH)
+            checkManager.createNotificationChannel(notificationChannel)
+        }
+    }
+}
