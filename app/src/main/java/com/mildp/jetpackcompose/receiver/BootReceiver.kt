@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.mildp.jetpackcompose.App
+import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.service.ForegroundService
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
@@ -24,7 +25,6 @@ class BootReceiver : BroadcastReceiver() {
 
         Helper().log(TAG,"Boot Completed")
 
-
         if (Intent.ACTION_BOOT_COMPLETED == intent.action || Intent.ACTION_USER_PRESENT == intent.action) {
             resetUnfinishedAlarms()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -40,17 +40,19 @@ class BootReceiver : BroadcastReceiver() {
 
         val bootTimeInMillis = System.currentTimeMillis()
         val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
-        val alarmStatus: MutableList<Pair<Long, Boolean>> = if (storedAlarmStatusJson != null) {
+        val alarmStatus: MutableList<Pair<Long, AlarmStatus>> = if (storedAlarmStatusJson != null) {
             Json.decodeFromString(storedAlarmStatusJson)
         } else {
             mutableListOf()
         }
 
         alarmStatus.forEachIndexed { index, (timeInMillis, completed) ->
-            if (timeInMillis + 2 * 60 * 60 * 1000 > bootTimeInMillis && !completed) {
+            if (timeInMillis + 2 * 60 * 60 * 1000 > bootTimeInMillis && completed == AlarmStatus.PREPARING) {
                 Helper().setAlarm(TAG, timeInMillis)
-            } else if (!completed) {
-                alarmStatus[index] = timeInMillis to true
+            } else if (completed == AlarmStatus.FINISHED) {
+                alarmStatus[index] = timeInMillis to AlarmStatus.FINISHED
+            } else {
+                alarmStatus[index] = timeInMillis to AlarmStatus.MISSED
             }
         }
 

@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.R
 import com.mildp.jetpackcompose.activity.MainActivity
+import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.database.MoodData
 import com.mildp.jetpackcompose.model.database.UsageData
 import com.mildp.jetpackcompose.utils.AppUsageHelper
@@ -46,7 +47,7 @@ class MoodViewModel : ViewModel() {
 
     private val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
     @OptIn(ExperimentalSerializationApi::class)
-    val alarmStatus: MutableList<Pair<Long, Boolean>> = if (storedAlarmStatusJson != null) {
+    val alarmStatus: MutableList<Pair<Long, AlarmStatus>> = if (storedAlarmStatusJson != null) {
         Json.decodeFromString(storedAlarmStatusJson)
     } else {
         mutableListOf()
@@ -120,9 +121,9 @@ class MoodViewModel : ViewModel() {
 
             App.instance().dataDao.insertMood(moodData)
 
-            val firstFalseIndex = alarmStatus.indexOfFirst { !it.second }
+            val firstFalseIndex = alarmStatus.indexOfFirst { it.second == AlarmStatus.PREPARING }
             if (firstFalseIndex >= 0) {
-                alarmStatus[firstFalseIndex] = Pair(alarmStatus[firstFalseIndex].first, true)
+                alarmStatus[firstFalseIndex] = Pair(alarmStatus[firstFalseIndex].first, AlarmStatus.FINISHED)
                 val updatedAlarmStatusJson = Json.encodeToString(alarmStatus)
                 kv.encode("alarmStatus", updatedAlarmStatusJson)
             }

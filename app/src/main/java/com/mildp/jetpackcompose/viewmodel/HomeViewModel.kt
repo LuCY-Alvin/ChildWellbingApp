@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.activity.SurveyActivity
+import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -22,7 +23,7 @@ class HomeViewModel: ViewModel() {
 
     private val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
     @OptIn(ExperimentalSerializationApi::class)
-    val alarmStatus: MutableList<Pair<Long, Boolean>> = if (storedAlarmStatusJson != null) {
+    val alarmStatus: MutableList<Pair<Long, AlarmStatus>> = if (storedAlarmStatusJson != null) {
         Json.decodeFromString(storedAlarmStatusJson.toString())
     } else {
         mutableListOf()
@@ -30,7 +31,7 @@ class HomeViewModel: ViewModel() {
 
     fun onSurveyStarted(participant: String){
         val currentTime = System.currentTimeMillis()
-        val pendingAlarm = alarmStatus.firstOrNull { !it.second }
+        val pendingAlarm = alarmStatus.firstOrNull { it.second == AlarmStatus.PREPARING }
 
         if (pendingAlarm != null) {
             if(permissionCheck()) {

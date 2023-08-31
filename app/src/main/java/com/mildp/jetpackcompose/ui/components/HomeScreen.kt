@@ -12,6 +12,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.viewmodel.HomeViewModel
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
@@ -117,11 +118,11 @@ fun formatTime(milliseconds: Long): String {
 }
 
 @Composable
-fun Countdown(alarmStatus: MutableList<Pair<Long, Boolean>>) {
+fun Countdown(alarmStatus: MutableList<Pair<Long, AlarmStatus>>) {
     val currentTime = System.currentTimeMillis()
 
     val closestTimestamp = alarmStatus
-        .firstOrNull { !it.second && it.first + 2 * 60 * 60 * 1000 > currentTime }
+        .firstOrNull { it.second == AlarmStatus.PREPARING && it.first + 2 * 60 * 60 * 1000 > currentTime }
 
     if (closestTimestamp != null) {
         if (currentTime >= closestTimestamp.first) {
@@ -146,7 +147,7 @@ fun Countdown(alarmStatus: MutableList<Pair<Long, Boolean>>) {
 }
 
 @Composable
-fun AlarmChecklist(alarmStatus: MutableList<Pair<Long, Boolean>>) {
+fun AlarmChecklist(alarmStatus: MutableList<Pair<Long, AlarmStatus>>) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(10.sdp,5.sdp)
@@ -191,11 +192,11 @@ fun AlarmChecklist(alarmStatus: MutableList<Pair<Long, Boolean>>) {
 
                 for (col in 1..3) {
                     val alarmIndex = (row - 1) * 3 + (col - 1)
-                    val alarmStatusText = if(alarmIndex < alarmStatus.size){
-                        if(alarmStatus[alarmIndex].second) {
-                            "已結束"
-                        } else {
-                            "準備中"
+                    val alarmStatusText = if(alarmIndex < alarmStatus.size) {
+                        when (alarmStatus[alarmIndex].second) {
+                            AlarmStatus.FINISHED ->  "已完成"
+                            AlarmStatus.PREPARING -> "準備中"
+                            else -> "已錯過"
                         }
                     } else {
                         ""
@@ -210,7 +211,11 @@ fun AlarmChecklist(alarmStatus: MutableList<Pair<Long, Boolean>>) {
                         Text(
                             text = alarmStatusText,
                             fontSize = 12.ssp,
-                            color = if (alarmStatusText == "已結束") MaterialTheme.colorScheme.error else LocalContentColor.current
+                            color = when(alarmStatusText) {
+                                     "已完成" -> MaterialTheme.colorScheme.primary
+                                     "準備中" -> LocalContentColor.current
+                                        else -> MaterialTheme.colorScheme.error
+                            }
                         )
                     }
                 }

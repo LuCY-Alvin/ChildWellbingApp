@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.mildp.jetpackcompose.App
+import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.service.ForegroundService
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
@@ -56,7 +57,7 @@ class SettingViewModel: ViewModel() {
 
     private val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
     @OptIn(ExperimentalSerializationApi::class)
-    val alarmStatus: MutableList<Pair<Long, Boolean>> = if (storedAlarmStatusJson != null) {
+    val alarmStatus: MutableList<Pair<Long, AlarmStatus>> = if (storedAlarmStatusJson != null) {
         Json.decodeFromString(storedAlarmStatusJson)
     } else {
         mutableListOf()
@@ -282,7 +283,7 @@ class SettingViewModel: ViewModel() {
             kv.encode("picked_afternoon", pickedAfternoon.toNanoOfDay())
             kv.encode("picked_night", pickedNight.toNanoOfDay())
 
-            val alarmStatus = mutableListOf<Pair<Long, Boolean>>()
+            val alarmStatus = mutableListOf<Pair<Long, AlarmStatus>>()
 
             for (i in 0..6) {
                 addAlarm(alarmStatus, morningInstant, i)
@@ -295,15 +296,15 @@ class SettingViewModel: ViewModel() {
         }
 
         Firebase.crashlytics.setUserId(subID)
-        alarmStatus.forEach { if(!it.second) Helper().setAlarm(TAG,it.first) }
+        alarmStatus.forEach { if(it.second == AlarmStatus.PREPARING) Helper().setAlarm(TAG,it.first) }
     }
 
-    private fun addAlarm(alarmStatus: MutableList<Pair<Long,Boolean>>,instant: Instant, i: Int) {
+    private fun addAlarm(alarmStatus: MutableList<Pair<Long,AlarmStatus>>,instant: Instant, i: Int) {
         val currentTime = System.currentTimeMillis()
         if(currentTime > instant.toEpochMilli() + i * 86400000) {
-            alarmStatus.add(Pair(instant.toEpochMilli() + i * 86400000, true))
+            alarmStatus.add(Pair(instant.toEpochMilli() + i * 86400000, AlarmStatus.MISSED))
         } else {
-            alarmStatus.add(Pair(instant.toEpochMilli() + i * 86400000, false))
+            alarmStatus.add(Pair(instant.toEpochMilli() + i * 86400000, AlarmStatus.PREPARING))
         }
     }
 

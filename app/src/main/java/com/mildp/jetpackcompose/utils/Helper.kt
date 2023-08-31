@@ -18,6 +18,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.*
 import com.mildp.jetpackcompose.App
+import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.database.Debug
 import com.mildp.jetpackcompose.model.service.AccessibilityService
 import com.mildp.jetpackcompose.receiver.MyAlarm
@@ -148,16 +149,16 @@ class Helper {
                 kv.encode("surveyCancelled",true)
 
                 val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
-                val alarmStatus: MutableList<Pair<Long, Boolean>> =
+                val alarmStatus: MutableList<Pair<Long, AlarmStatus>> =
                     if (storedAlarmStatusJson != null) {
                         Json.decodeFromString(storedAlarmStatusJson)
                     } else {
                         mutableListOf()
                     }
 
-                val firstFalseIndex = alarmStatus.indexOfFirst { !it.second }
+                val firstFalseIndex = alarmStatus.indexOfFirst { it.second == AlarmStatus.PREPARING }
                 if (firstFalseIndex >= 0) {
-                    alarmStatus[firstFalseIndex] = Pair(alarmStatus[firstFalseIndex].first, true)
+                    alarmStatus[firstFalseIndex] = Pair(alarmStatus[firstFalseIndex].first, AlarmStatus.MISSED)
                     val updatedAlarmStatusJson = Json.encodeToString(alarmStatus)
                     kv.encode("alarmStatus", updatedAlarmStatusJson)
                 }
