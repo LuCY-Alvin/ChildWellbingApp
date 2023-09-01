@@ -47,7 +47,8 @@ class Helper {
 
     fun databaseDay(): Int{
         val initTime = kv.decodeLong("initTime",0)
-        val realTime = Calendar.getInstance().timeInMillis
+        val realTime = System.currentTimeMillis()
+
         return ( (realTime - initTime).toInt() / 86400000) + 1
     }
 

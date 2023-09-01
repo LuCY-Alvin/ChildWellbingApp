@@ -1,9 +1,11 @@
 package com.mildp.jetpackcompose.viewmodel
 
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.utils.Helper
 import com.mildp.jetpackcompose.utils.ProgressRequestBody
 import kotlinx.coroutines.*
@@ -78,6 +80,7 @@ class UploadViewModel: ViewModel() {
                                 TAG,
                                 "send fail:${file.name}, error: $e"
                             )
+                            Toast.makeText(App.instance(),"上傳失敗，請關閉App後重試",Toast.LENGTH_SHORT).show()
                             call.cancel()
                         }
 
@@ -87,11 +90,13 @@ class UploadViewModel: ViewModel() {
                                     TAG,
                                     "send success:${file.name}, over Response: + ${response.body?.string()}"
                                 )
+                                Toast.makeText(App.instance(),"上傳成功",Toast.LENGTH_SHORT).show()
                             } catch (e: IOException) {
                                 Helper().log(
                                     TAG,
                                     "send fail:${file.name}, error: $e"
                                 )
+                                Toast.makeText(App.instance(),"上傳失敗，請關閉App後重試",Toast.LENGTH_SHORT).show()
                             } finally {
                                 response.close()
                             }

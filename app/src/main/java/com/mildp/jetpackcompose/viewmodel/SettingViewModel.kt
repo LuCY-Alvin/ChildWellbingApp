@@ -291,9 +291,13 @@ class SettingViewModel: ViewModel() {
                 addAlarm(alarmStatus, nightInstant, i)
             }
 
+            val initTime =
+                ZonedDateTime.of(pickedDate, LocalTime.MIDNIGHT, ZoneOffset.systemDefault())
+            val initTimeInMillis = initTime.toInstant().toEpochMilli()
+
             val alarmStatusJson = Json.encodeToString(alarmStatus)
             kv.encode("alarmStatus", alarmStatusJson)
-            kv.encode("initTime", pickedDate.toEpochDay())
+            kv.encode("initTime", initTimeInMillis)
         }
 
         Firebase.crashlytics.setUserId(subID)
