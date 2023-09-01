@@ -293,6 +293,7 @@ class SettingViewModel: ViewModel() {
 
             val alarmStatusJson = Json.encodeToString(alarmStatus)
             kv.encode("alarmStatus", alarmStatusJson)
+            kv.encode("initTime", pickedDate.toEpochDay())
         }
 
         Firebase.crashlytics.setUserId(subID)

@@ -292,15 +292,18 @@ data class TMTStopData(
     @ColumnInfo(name = "Participant")
     var participant: String = "",
 
-    @ColumnInfo(name = "stopPoint")
+    @ColumnInfo(name = "StopPoint")
     var stopPoint: Int? = 0,
 
     @ColumnInfo(name = "StopTime")
     var stopTime: Long? = 0,
 
+    @ColumnInfo(name = "TimeStamp")
+    var timeStamp: String = ""
+
     ) {
-    constructor(Day: Int, participant: String, stopPoint: Int?, stopTime: Long?)
-            : this(0, Day, participant, stopPoint, stopTime)
+    constructor(Day: Int, participant: String, stopPoint: Int?, stopTime: Long?, timeStamp: String)
+            : this(0, Day, participant, stopPoint, stopTime, timeStamp)
 }
 
 @Entity(tableName = "ActivityRecognitionData")

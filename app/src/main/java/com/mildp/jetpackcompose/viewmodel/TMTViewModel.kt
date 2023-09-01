@@ -190,7 +190,7 @@ class TMTViewModel: ViewModel() {
     fun handleFingerDown(number: Int, restartTime: Long){
         val stopTMTData = TMTStopData(
             Helper().databaseDay(), participant,
-            number, restartTime
+            number, restartTime, Helper().timeString(System.currentTimeMillis())
         )
         App.instance().dataDao.insertStopPoint(stopTMTData)
     }
