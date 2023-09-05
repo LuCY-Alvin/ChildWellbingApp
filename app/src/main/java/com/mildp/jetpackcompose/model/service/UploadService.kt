@@ -139,8 +139,6 @@ class UploadService : Service() {
 
                                 if (uploadMap.values.all { it }) {
                                     manager.cancel(NOTIFICATION_ID3)
-                                    val number = kv.decodeInt("uploadNumber", 1)
-                                    kv.encode("uploadNumber", number + 1)
                                     kv.encode("uploadServiceReady", false)
                                 }
                             }
@@ -159,7 +157,6 @@ class UploadService : Service() {
 
     private fun upload() {
         val path = App.instance().dataDir.canonicalPath
-        val number = kv.decodeInt("uploadNumber",1)
         val id = kv.decodeString("subID","")
 
         uploadProgressLiveData.observeForever { message ->
@@ -168,16 +165,16 @@ class UploadService : Service() {
             manager.notify(NOTIFICATION_ID3, builder.build())
         }
         try {
-            val num = number.toString()
+            val num = Helper().databaseDay()
 
-            DataBase.getDatabase(App.instance())?.backupDatabase(this,num)
+            DataBase.getDatabase(App.instance())?.backupDatabase(this,num.toString())
             uploadFile("$path/databases/database-$id-backup-$num",0)
-            uploadFile("$path/zipFile_${id}_day$number.zip",1)
+            uploadFile("$path/zipFile_${id}_day$num.zip",1)
 
-            if(number >= 2) {
-                this.deleteDatabase("database-$id-backup-${number - 1}")
-                this.deleteDatabase("database-$id-backup-${number - 1}-wal")
-                this.deleteDatabase("database-$id-backup-${number - 1}-shm")
+            if(num >= 2) {
+                this.deleteDatabase("database-$id-backup-${num - 1}")
+                this.deleteDatabase("database-$id-backup-${num - 1}-wal")
+                this.deleteDatabase("database-$id-backup-${num - 1}-shm")
             }
 
         } catch (e: Exception) {

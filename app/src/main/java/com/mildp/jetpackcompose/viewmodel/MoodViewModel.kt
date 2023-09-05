@@ -117,7 +117,6 @@ class MoodViewModel : ViewModel() {
 
             val path = App.instance().dataDir.canonicalPath
             val id = kv.decodeString("subID", "")
-            val number = kv.decodeInt("uploadNumber", 1)
 
             App.instance().dataDao.insertMood(moodData)
 
@@ -130,7 +129,7 @@ class MoodViewModel : ViewModel() {
 
             if (currentTime in LocalTime.of(19, 0)..LocalTime.of(23, 59)) {
 
-                ZipUtils.zipFolders("$path/files", "$path/zipFile_${id}_day$number.zip")
+                ZipUtils.zipFolders("$path/files", "$path/zipFile_${id}_day${Helper().databaseDay()}.zip")
                 kv.encode("uploadServiceReady", true)
                 Helper().log(TAG,"Upload Ready!!")
 

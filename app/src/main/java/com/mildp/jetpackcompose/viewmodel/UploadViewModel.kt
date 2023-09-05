@@ -1,14 +1,12 @@
 package com.mildp.jetpackcompose.viewmodel
 
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.utils.Helper
 import com.mildp.jetpackcompose.utils.ProgressRequestBody
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody

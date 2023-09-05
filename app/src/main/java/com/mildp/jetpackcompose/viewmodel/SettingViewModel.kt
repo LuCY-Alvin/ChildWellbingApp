@@ -1,8 +1,7 @@
 package com.mildp.jetpackcompose.viewmodel
 
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
+import android.app.NotificationManager
 import android.bluetooth.BluetoothManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -26,6 +25,7 @@ import com.google.firebase.ktx.Firebase
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.service.ForegroundService
+import com.mildp.jetpackcompose.utils.Constants.NOTIFICATION_ID
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
 import kotlinx.coroutines.*
@@ -355,29 +355,11 @@ class SettingViewModel: ViewModel() {
             Toast.makeText(App.instance(), "測驗將在您設定的時間通知您", Toast.LENGTH_SHORT).show()
             checkJob = scanCheckTask()
 
-            val survey = kv.decodeLong("initTime", 0)
-
-            val surveyStartIntent = Intent(App.instance(), ForegroundService::class.java)
-            val alarmManager = App.instance().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val pendingIntent = PendingIntent.getService(
-                App.instance(),
-                52522,
-                surveyStartIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                survey,
-                pendingIntent
-            )
-
-            Helper().log(TAG,"set exp. in ${Helper().timeString(survey)}")
-
-            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //    App.instance().startForegroundService(Intent(App.instance(), ForegroundService::class.java))
-            //} else {
-            //    App.instance().startService(Intent(App.instance(), ForegroundService::class.java))
-            //}
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                App.instance().startForegroundService(Intent(App.instance(), ForegroundService::class.java))
+            } else {
+                App.instance().startService(Intent(App.instance(), ForegroundService::class.java))
+            }
         }
     }
 
@@ -413,5 +395,15 @@ class SettingViewModel: ViewModel() {
         } else if (device == "手環") {
             _miBandFoundLiveData.value = true
         }
+    }
+
+    fun serviceStarted(): Boolean{
+        val notificationManager: NotificationManager =
+            App.instance().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        for (notification in notificationManager.activeNotifications){
+            return notification.id == NOTIFICATION_ID
+        }
+        return false
     }
 }

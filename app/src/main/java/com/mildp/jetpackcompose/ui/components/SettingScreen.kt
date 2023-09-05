@@ -458,17 +458,35 @@ fun SettingScreen(
 
             Spacer(modifier = Modifier.padding(5.sdp))
 
-            Button(
-                onClick = {
-                    settingViewModel.onStoreAllChange()
-                    settingViewModel.startMyProject()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "儲存")
+                Button(
+                    onClick = {
+                        settingViewModel.onStoreAllChange()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    modifier = Modifier.weight(1f).padding(5.sdp),
+                ) {
+                    Text(text = "儲存設定")
+                }
+
+                Button(
+                    onClick = {
+                        settingViewModel.startMyProject()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    modifier = Modifier.weight(1f).padding(5.sdp),
+                    enabled = !settingViewModel.serviceStarted()
+                ) {
+                    Text(text = "開始實驗")
+                }
             }
 
             if(settingViewModel.phoneFoundLiveData.value == false || settingViewModel.miBandFoundLiveData.value == false) {
