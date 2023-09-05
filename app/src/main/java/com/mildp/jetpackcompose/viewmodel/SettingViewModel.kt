@@ -404,6 +404,7 @@ class SettingViewModel: ViewModel() {
         for (notification in notificationManager.activeNotifications){
             return notification.id == NOTIFICATION_ID
         }
+
         return false
     }
 }

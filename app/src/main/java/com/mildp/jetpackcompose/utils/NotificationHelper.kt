@@ -1,9 +1,6 @@
 package com.mildp.jetpackcompose.utils
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.TaskStackBuilder
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -23,6 +20,17 @@ class NotificationHelper(private val context: Context) {
 
     private val notificationManager: NotificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    fun createNotificationChannel(
+        channelId: String,
+        channelName: String,
+        importance: Int
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(channelId, channelName, importance)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 
     fun showSurveyNotification() {
         val id = System.currentTimeMillis().toInt()
@@ -59,11 +67,22 @@ class NotificationHelper(private val context: Context) {
         Helper().scheduleNotificationDismissal(notificationManager, 2 * 60 * 60 * 1000,TAG)
     }
 
-    fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel =
-                NotificationChannel(CHANNEL_ID2, "My Survey", NotificationManager.IMPORTANCE_HIGH)
-            notificationManager.createNotificationChannel(serviceChannel)
+    fun showBleNotification(service: Service){
+        val notificationIntent = Intent(context, MainActivity::class.java)
+
+        val pendingIntent = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(notificationIntent)
+            getPendingIntent(1998, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
+
+        val notification = NotificationCompat
+            .Builder(context, Constants.CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        service.startForeground(Constants.NOTIFICATION_ID, notification)
     }
+
 }

@@ -1,6 +1,5 @@
 package com.mildp.jetpackcompose.model.service
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
@@ -18,6 +17,7 @@ import com.mildp.jetpackcompose.utils.Constants.CHANNEL_ID3
 import com.mildp.jetpackcompose.utils.Constants.NOTIFICATION_ID3
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
+import com.mildp.jetpackcompose.utils.NotificationHelper
 import com.mildp.jetpackcompose.utils.ProgressRequestBody
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -57,12 +57,12 @@ class UploadService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val serviceChannel = NotificationChannel(
+                val notificationHelper = NotificationHelper(this)
+                notificationHelper.createNotificationChannel(
                     CHANNEL_ID3,
                     "Upload Service",
                     NotificationManager.IMPORTANCE_DEFAULT
                 )
-                manager.createNotificationChannel(serviceChannel)
             }
             manager.notify(NOTIFICATION_ID3, builder.build())
             upload()
