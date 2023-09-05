@@ -19,6 +19,8 @@ import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
 import com.mildp.jetpackcompose.utils.NotificationHelper
 import com.mildp.jetpackcompose.utils.ProgressRequestBody
+import com.mildp.jetpackcompose.utils.ZipUtils
+import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -39,6 +41,7 @@ class UploadService : Service() {
     private var secondValue = 0L
     private var total = 0L
 
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private val manager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private val builder = NotificationCompat
         .Builder(this, CHANNEL_ID3)
@@ -72,14 +75,16 @@ class UploadService : Service() {
         return START_NOT_STICKY
     }
 
-    private fun uploadFile(sourceFileUri: String, num: Int) {
+    private suspend fun uploadFile(sourceFileUri: String, num: Int) {
         try {
             val file = File(sourceFileUri)
             if (!file.exists()) {
-                try {
-                    file.createNewFile()
-                } catch (e: IOException) {
-                    Helper().log(TAG,"File Create Failed: $e")
+                withContext(Dispatchers.IO) {
+                    try {
+                        file.createNewFile()
+                    } catch (e: IOException) {
+                        Helper().log(TAG, "File Create Failed: $e")
+                    }
                 }
             }
             total += file.length().toInt()
@@ -156,29 +161,44 @@ class UploadService : Service() {
     }
 
     private fun upload() {
-        val path = App.instance().dataDir.canonicalPath
-        val id = kv.decodeString("subID","")
+        coroutineScope.launch {
+            val path = App.instance().dataDir.canonicalPath
+            val id = kv.decodeString("subID", "")
 
-        uploadProgressLiveData.observeForever { message ->
-            builder.setContentText("請保持網路連接，檔案上傳中，請稍後")
-                .setProgress(100, message, false)
-            manager.notify(NOTIFICATION_ID3, builder.build())
-        }
-        try {
-            val num = Helper().databaseDay()
-
-            DataBase.getDatabase(App.instance())?.backupDatabase(this,num.toString())
-            uploadFile("$path/databases/database-$id-backup-$num",0)
-            uploadFile("$path/zipFile_${id}_day$num.zip",1)
-
-            if(num >= 2) {
-                this.deleteDatabase("database-$id-backup-${num - 1}")
-                this.deleteDatabase("database-$id-backup-${num - 1}-wal")
-                this.deleteDatabase("database-$id-backup-${num - 1}-shm")
+            uploadProgressLiveData.observeForever { message ->
+                builder.setContentText("請保持網路連接，檔案上傳中，請稍後")
+                    .setProgress(100, message, false)
+                manager.notify(NOTIFICATION_ID3, builder.build())
             }
+            try {
+                val num = Helper().databaseDay()
 
-        } catch (e: Exception) {
-            Helper().log(TAG, "upload failed: $e")
+                val zipCompleted = async {
+                    DataBase.getDatabase(App.instance())?.backupDatabase(this@UploadService, num.toString())
+                    ZipUtils.zipFolders("$path/files", "$path/zipFile_${id}_day$num.zip")
+                    true // 表示壓縮完成
+                }
+
+                if (zipCompleted.await()) {
+                    uploadFile("$path/databases/database-$id-backup-$num", 0)
+                    uploadFile("$path/zipFile_${id}_day$num.zip", 1)
+
+                    if (num >= 2) {
+                        this@UploadService.deleteDatabase("database-$id-backup-${num - 1}")
+                        this@UploadService.deleteDatabase("database-$id-backup-${num - 1}-wal")
+                        this@UploadService.deleteDatabase("database-$id-backup-${num - 1}-shm")
+                    }
+                } else {
+                    Helper().log(TAG, "壓縮尚未完成")
+                }
+            } catch (e: Exception) {
+                Helper().log(TAG, "upload failed: $e")
+            }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        coroutineScope.cancel()
     }
 }

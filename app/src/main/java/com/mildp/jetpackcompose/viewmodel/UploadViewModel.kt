@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mildp.jetpackcompose.utils.Helper
 import com.mildp.jetpackcompose.utils.ProgressRequestBody
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -30,19 +32,15 @@ class UploadViewModel: ViewModel() {
     }
 
     fun uploadFile(fileUri: String, num: Int) {
-        try {
-            val file = File(fileUri)
-            if (!file.exists()) {
-                try {
-                    file.createNewFile()
-                } catch (e: IOException) {
-                    Helper().log(TAG, "File Create Failed: $e")
+        viewModelScope.launch {
+            try {
+                val file = File(fileUri)
+                if (!file.exists()) {
+                    Helper().log(TAG, "File does not exist: $fileUri")
+                    return@launch
                 }
-            }
 
-            total += file.length()
-
-            viewModelScope.launch {
+                total += file.length()
                 val requestBody: RequestBody = MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart(
@@ -59,11 +57,10 @@ class UploadViewModel: ViewModel() {
                         ProgressRequestBody(requestBody) { bytesWritten, _ ->
                             if (num == 0) firstValue = bytesWritten
                             else secondValue = bytesWritten
-                            val progress = ((firstValue + secondValue) *100 / total).toInt()
+                            val progress = ((firstValue + secondValue) * 100 / total).toInt()
                             uploadProgressLiveData.postValue(progress)
                         })
                     .build()
-
 
                 val client = OkHttpClient.Builder()
                     .connectTimeout(7, TimeUnit.MINUTES)
@@ -71,36 +68,31 @@ class UploadViewModel: ViewModel() {
                     .readTimeout(7, TimeUnit.MINUTES)
                     .build()
 
-                with(client) {
-                    newCall(request).enqueue(object : Callback {
-                        override fun onFailure(call: Call, e: IOException) {
-                            Helper().log(
-                                TAG,
-                                "send fail:${file.name}, error: $e"
-                            )
-                            call.cancel()
-                        }
-
-                        override fun onResponse(call: Call, response: Response) {
-                            try {
-                                Helper().log(
-                                    TAG,
-                                    "send success:${file.name}, over Response: + ${response.body?.string()}"
-                                )
-                            } catch (e: IOException) {
-                                Helper().log(
-                                    TAG,
-                                    "send fail:${file.name}, error: $e"
-                                )
-                            } finally {
-                                response.close()
-                            }
-                        }
-                    })
+                val response = withContext(Dispatchers.IO) {
+                    client.newCall(request).execute()
                 }
+
+                if (response.isSuccessful) {
+                    Helper().log(TAG, "Upload successful: ${file.name}")
+                } else {
+                    Helper().log(TAG, "Upload failed: ${file.name}, Response: ${response.code}")
+                }
+
+                response.close()
+
+            } catch (e: Exception) {
+                Helper().log(TAG, e.toString())
             }
-        } catch (e:Exception) {
-            Helper().log(TAG,e.toString())
         }
+    }
+
+    private val zipCompletedLiveData = MutableLiveData<Boolean>()
+
+    fun getZipCompletedLiveData(): LiveData<Boolean> {
+        return zipCompletedLiveData
+    }
+
+    fun setZipCompleted(completed: Boolean) {
+        zipCompletedLiveData.postValue(completed)
     }
 }

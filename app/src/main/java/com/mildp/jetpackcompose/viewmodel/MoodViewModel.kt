@@ -21,7 +21,6 @@ import com.mildp.jetpackcompose.utils.AppUsageHelper
 import com.mildp.jetpackcompose.utils.Constants
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
-import com.mildp.jetpackcompose.utils.ZipUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -115,9 +114,6 @@ class MoodViewModel : ViewModel() {
             notificationManager.cancel(Constants.NOTIFICATION_ID2)
             kv.encode("surveyCancelled", true)
 
-            val path = App.instance().dataDir.canonicalPath
-            val id = kv.decodeString("subID", "")
-
             App.instance().dataDao.insertMood(moodData)
 
             val firstFalseIndex = alarmStatus.indexOfFirst { it.second == AlarmStatus.PREPARING }
@@ -129,7 +125,6 @@ class MoodViewModel : ViewModel() {
 
             if (currentTime in LocalTime.of(19, 0)..LocalTime.of(23, 59)) {
 
-                ZipUtils.zipFolders("$path/files", "$path/zipFile_${id}_day${Helper().databaseDay()}.zip")
                 kv.encode("uploadServiceReady", true)
                 Helper().log(TAG,"Upload Ready!!")
 

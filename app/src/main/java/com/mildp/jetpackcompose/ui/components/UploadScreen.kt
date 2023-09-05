@@ -1,5 +1,6 @@
 package com.mildp.jetpackcompose.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
@@ -17,21 +18,34 @@ import com.mildp.jetpackcompose.utils.ZipUtils
 import com.mildp.jetpackcompose.viewmodel.UploadViewModel
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun UploadScreen(
     uploadViewModel: UploadViewModel = viewModel()
 ) {
     var progress by remember { mutableStateOf(0) }
-    uploadViewModel.getUploadProgressLiveData().observeAsState().value?.let { newProgress ->
-        progress = newProgress
-    }
+    val progressLiveData = uploadViewModel.getUploadProgressLiveData().observeAsState()
 
     val path = App.instance().dataDir.canonicalPath
     val id = kv.decodeString("subID","")
 
-    DataBase.getDatabase(App.instance())?.backupDatabase(App.instance(),"temp")
-    ZipUtils.zipFolders("$path/files", "$path/zipFile_${id}_temp.zip")
+    val isZipCompleted by uploadViewModel.getZipCompletedLiveData().observeAsState(false)
+
+    LaunchedEffect(progressLiveData.value) {
+        progressLiveData.value?.let { newProgress ->
+            progress = newProgress
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            DataBase.getDatabase(App.instance())?.backupDatabase(App.instance(), "temp")
+            ZipUtils.zipFolders("$path/files", "$path/zipFile_${id}_temp.zip")
+            uploadViewModel.setZipCompleted(true)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -51,8 +65,12 @@ fun UploadScreen(
 
         Button(
             onClick = {
-                uploadViewModel.uploadFile("$path/databases/database-$id-backup-temp",0)
-                uploadViewModel.uploadFile("$path/zipFile_${id}_temp.zip",1)
+                if (isZipCompleted) {
+                    uploadViewModel.uploadFile("$path/databases/database-$id-backup-temp", 0)
+                    uploadViewModel.uploadFile("$path/zipFile_${id}_temp.zip", 1)
+                } else {
+                    Toast.makeText(App.instance(),"檔案處理中，請稍等",Toast.LENGTH_SHORT).show()
+                }
             },
             modifier = Modifier,
         ) {

@@ -64,7 +64,7 @@ class NotificationHelper(private val context: Context) {
         notificationManager.notify(Constants.NOTIFICATION_ID2,notification)
         kv.encode("surveyCancelled",false)
 
-        Helper().scheduleNotificationDismissal(notificationManager, 2 * 60 * 60 * 1000,TAG)
+        Helper().scheduleNotificationDismissal(notificationManager, 2 * 60 * 60 * 1000, TAG)
     }
 
     fun showBleNotification(service: Service){

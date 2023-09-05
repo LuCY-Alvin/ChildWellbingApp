@@ -13,7 +13,8 @@ class MyAlarm : BroadcastReceiver() {
         val notificationHelper = NotificationHelper(context)
 
         if (intent.action == "survey") {
-            notificationHelper.createNotificationChannel(CHANNEL_ID2, "My Survey",
+            notificationHelper.createNotificationChannel(
+                CHANNEL_ID2, "My Survey",
                 NotificationManager.IMPORTANCE_HIGH)
             notificationHelper.showSurveyNotification()
         }
