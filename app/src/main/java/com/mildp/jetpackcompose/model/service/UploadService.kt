@@ -165,11 +165,14 @@ class UploadService : Service() {
             val path = App.instance().dataDir.canonicalPath
             val id = kv.decodeString("subID", "")
 
-            uploadProgressLiveData.observeForever { message ->
-                builder.setContentText("請保持網路連接，檔案上傳中，請稍後")
-                    .setProgress(100, message, false)
-                manager.notify(NOTIFICATION_ID3, builder.build())
+            Handler(Looper.getMainLooper()).post {
+                uploadProgressLiveData.observeForever { message ->
+                    builder.setContentText("請保持網路連接，檔案上傳中，請稍後")
+                        .setProgress(100, message, false)
+                    manager.notify(NOTIFICATION_ID3, builder.build())
+                }
             }
+
             try {
                 val num = Helper().databaseDay()
 
