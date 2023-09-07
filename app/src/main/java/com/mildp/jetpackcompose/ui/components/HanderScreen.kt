@@ -25,9 +25,10 @@ import ir.kaaveh.sdpcompose.sdp
 
 @Composable
 fun HanderScreen(
-    handerViewModel: HanderViewModel = viewModel(),
     navController: NavHostController
 ) {
+    val handerViewModel: HanderViewModel = viewModel()
+
     BackHandler(enabled = true) {
         Toast.makeText(App.instance(),"請繼續作答，不要退回前一頁，感謝。", Toast.LENGTH_SHORT).show()
     }

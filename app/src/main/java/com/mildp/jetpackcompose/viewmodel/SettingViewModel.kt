@@ -13,11 +13,10 @@ import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -44,6 +43,9 @@ class SettingViewModel: ViewModel() {
 
     var subID by mutableStateOf(kv.decodeString("subID","").toString())
 
+    private val _isEditing = mutableStateOf(kv.decodeBool("edit",true))
+    val isEditing: State<Boolean> = _isEditing
+
     var pickedDate: LocalDate by mutableStateOf(LocalDate.now())
     var pickedMorning: LocalTime by mutableStateOf(LocalTime.of(8,0))
     var pickedAfternoon: LocalTime by mutableStateOf(LocalTime.of(14,0))
@@ -51,11 +53,11 @@ class SettingViewModel: ViewModel() {
 
     private var checkJob: Job = Job()
 
-    private val _phoneFoundLiveData = MutableLiveData(kv.decodeBool("phoneFound",false))
-    val phoneFoundLiveData: LiveData<Boolean> = _phoneFoundLiveData
+    private val _phoneFoundLiveData = mutableStateOf(kv.decodeBool("phoneFound",false))
+    val phoneFoundLiveData: State<Boolean> = _phoneFoundLiveData
 
-    private val _miBandFoundLiveData = MutableLiveData(kv.decodeBool("mibandFound",false))
-    val miBandFoundLiveData: LiveData<Boolean> = _miBandFoundLiveData
+    private val _miBandFoundLiveData = mutableStateOf(kv.decodeBool("mibandFound",false))
+    val miBandFoundLiveData: State<Boolean> = _miBandFoundLiveData
 
     private val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
     @OptIn(ExperimentalSerializationApi::class)
@@ -263,49 +265,51 @@ class SettingViewModel: ViewModel() {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun onStoreAllChange() {
-        kv.encode("subID",subID)
-        uuidGenerator()
+    fun onStoreOrEdit() {
+        if(isEditing.value) {
+            kv.encode("subID", subID)
+            kv.encode("edit",false)
+            _isEditing.value = false
+            uuidGenerator()
 
-        if(storedAlarmStatusJson == null) {
-            val morningInstant =
-                ZonedDateTime.of(pickedDate, pickedMorning, ZoneOffset.systemDefault()).toInstant()
-            val afternoonInstant =
-                ZonedDateTime.of(pickedDate, pickedAfternoon, ZoneOffset.systemDefault())
-                    .toInstant()
-            val nightInstant =
-                ZonedDateTime.of(pickedDate, pickedNight, ZoneOffset.systemDefault()).toInstant()
+            if (storedAlarmStatusJson == null) {
+                val morningInstant = ZonedDateTime.of(pickedDate, pickedMorning, ZoneOffset.systemDefault()).toInstant()
+                val afternoonInstant = ZonedDateTime.of(pickedDate, pickedAfternoon, ZoneOffset.systemDefault()).toInstant()
+                val nightInstant = ZonedDateTime.of(pickedDate, pickedNight, ZoneOffset.systemDefault()).toInstant()
 
-            kv.encode("morningAlarm", morningInstant.toEpochMilli())
-            kv.encode("afternoonAlarm", afternoonInstant.toEpochMilli())
-            kv.encode("nightAlarm", nightInstant.toEpochMilli())
+                kv.encode("picked_date", pickedDate.toEpochDay())
+                kv.encode("picked_morning", pickedMorning.toNanoOfDay())
+                kv.encode("picked_afternoon", pickedAfternoon.toNanoOfDay())
+                kv.encode("picked_night", pickedNight.toNanoOfDay())
 
-            kv.encode("picked_date", pickedDate.toEpochDay())
-            kv.encode("picked_morning", pickedMorning.toNanoOfDay())
-            kv.encode("picked_afternoon", pickedAfternoon.toNanoOfDay())
-            kv.encode("picked_night", pickedNight.toNanoOfDay())
+                val alarmStatus = mutableListOf<Pair<Long, AlarmStatus>>()
 
-            val alarmStatus = mutableListOf<Pair<Long, AlarmStatus>>()
+                for (i in 0..6) {
+                    addAlarm(alarmStatus, morningInstant, i)
+                    addAlarm(alarmStatus, afternoonInstant, i)
+                    addAlarm(alarmStatus, nightInstant, i)
+                }
 
-            for (i in 0..6) {
-                addAlarm(alarmStatus, morningInstant, i)
-                addAlarm(alarmStatus, afternoonInstant, i)
-                addAlarm(alarmStatus, nightInstant, i)
+                val initTime = ZonedDateTime.of(pickedDate, LocalTime.MIDNIGHT, ZoneOffset.systemDefault())
+                val initTimeInMillis = initTime.toInstant().toEpochMilli()
+
+                val alarmStatusJson = Json.encodeToString(alarmStatus)
+                kv.encode("alarmStatus", alarmStatusJson)
+                kv.encode("initTime", initTimeInMillis)
+
+                alarmStatus.forEach {
+                    if (it.second == AlarmStatus.PREPARING) Helper().setAlarm(TAG, it.first)
+                }
             }
 
-            val initTime =
-                ZonedDateTime.of(pickedDate, LocalTime.MIDNIGHT, ZoneOffset.systemDefault())
-            val initTimeInMillis = initTime.toInstant().toEpochMilli()
-
-            val alarmStatusJson = Json.encodeToString(alarmStatus)
-            kv.encode("alarmStatus", alarmStatusJson)
-            kv.encode("initTime", initTimeInMillis)
-
-            alarmStatus.forEach { if(it.second == AlarmStatus.PREPARING) Helper().setAlarm(TAG,it.first) }
+            Firebase.crashlytics.setUserId(subID)
+            alarmStatus.forEach {
+                if (it.second == AlarmStatus.PREPARING) Helper().setAlarm(TAG, it.first)
+            }
+        } else {
+            kv.encode("edit",true)
+            _isEditing.value = true
         }
-
-        Firebase.crashlytics.setUserId(subID)
-        alarmStatus.forEach { if(it.second == AlarmStatus.PREPARING) Helper().setAlarm(TAG,it.first) }
     }
 
     private fun addAlarm(alarmStatus: MutableList<Pair<Long,AlarmStatus>>,instant: Instant, i: Int) {
@@ -372,28 +376,20 @@ class SettingViewModel: ViewModel() {
                 val bandMacSet = kv.decodeString("bandMacSet", "")
                 withContext(Dispatchers.Main) {
                     if (uuidScan == "[$uuidSet]") {
-                        onFound("手機")
+                        _phoneFoundLiveData.value = true
                         kv.encode("phoneFound",true)
                     } else if (bandMacScan == bandMacSet) {
-                        onFound("手環")
+                        _miBandFoundLiveData.value = true
                         kv.encode("mibandFound",true)
                     } else {
                         Helper().log(TAG,"尚未尋得")
                     }
                 }
-                if (phoneFoundLiveData.value == true && miBandFoundLiveData.value == true) {
+                if (phoneFoundLiveData.value && miBandFoundLiveData.value) {
                     break
                 }
                 delay(3000L)
             }
-        }
-    }
-
-    private fun onFound(device: String) {
-        if (device == "手機") {
-            _phoneFoundLiveData.value = true
-        } else if (device == "手環") {
-            _miBandFoundLiveData.value = true
         }
     }
 

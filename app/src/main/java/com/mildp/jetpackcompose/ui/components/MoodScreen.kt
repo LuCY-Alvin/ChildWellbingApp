@@ -28,9 +28,8 @@ import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 
 @Composable
-fun MoodScreen(
-    moodViewModel: MoodViewModel = viewModel()
-) {
+fun MoodScreen() {
+    val  moodViewModel: MoodViewModel = viewModel()
     moodViewModel.onAppUsageData()
 
     val imageIds = listOf(

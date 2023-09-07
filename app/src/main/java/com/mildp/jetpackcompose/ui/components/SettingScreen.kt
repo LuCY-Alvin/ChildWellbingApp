@@ -34,10 +34,9 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun SettingScreen(
-   settingViewModel: SettingViewModel = viewModel()
-) {
+fun SettingScreen() {
     val scrollState = rememberScrollState()
+    val settingViewModel: SettingViewModel = viewModel()
 
     settingViewModel.checkPermission()
 
@@ -73,11 +72,15 @@ fun SettingScreen(
                     keyboardType = KeyboardType.Ascii,
                     imeAction = ImeAction.Done
                 ),
+                enabled = settingViewModel.isEditing.value
             )
 
             Spacer(modifier = Modifier.padding(15.sdp))
 
-            Text(text = "實驗時間")
+            Text(
+                text = "實驗時間",
+                fontSize = 14.ssp,
+            )
 
             Spacer(modifier = Modifier.padding(5.sdp))
 
@@ -95,10 +98,12 @@ fun SettingScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                ),
+                enabled = settingViewModel.isEditing.value
             ) {
                 Text(
                     text = formattedDate,
+                    fontSize = 12.ssp,
                 )
             }
             MaterialDialog(
@@ -140,21 +145,24 @@ fun SettingScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.ssp,
                 )
                 Text(
                     text = "下午",
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.ssp,
                 )
                 Text(
                     text = "晚上",
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.ssp,
                 )
             }
 
@@ -179,10 +187,12 @@ fun SettingScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    ),
+                    enabled =  settingViewModel.isEditing.value
                 ) {
                     Text(
                         text = formattedMorning,
+                        fontSize = 12.ssp,
                     )
                 }
                 MaterialDialog(
@@ -227,11 +237,14 @@ fun SettingScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    ),
+                    enabled =  settingViewModel.isEditing.value
                 ) {
                     Text(
                         text = formattedAfternoon,
-                    )
+                        fontSize = 12.ssp,
+
+                        )
                 }
                 MaterialDialog(
                     dialogState = afternoonDialogState,
@@ -275,10 +288,12 @@ fun SettingScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    ),
+                    enabled =  settingViewModel.isEditing.value
                 ) {
                     Text(
                         text = formattedNight,
+                        fontSize = 12.ssp,
                     )
                 }
                 MaterialDialog(
@@ -312,7 +327,7 @@ fun SettingScreen(
                 textAlign = TextAlign.Center,
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.ssp
+                    fontSize = 14.ssp
                 )
             )
 
@@ -324,6 +339,7 @@ fun SettingScreen(
             ) {
                 Text(
                     text = "關閉省電最佳化",
+                    fontSize = 12.ssp,
                     modifier = Modifier
                         .weight(2f)
                         .fillMaxSize(),
@@ -342,6 +358,7 @@ fun SettingScreen(
                 ) {
                     Text(
                         text = settingViewModel.isBatteryOptimizeClosed.let { if (it) "已開啟" else "未開啟" },
+                        fontSize = 12.ssp,
                     )
                 }
             }
@@ -356,6 +373,7 @@ fun SettingScreen(
                         .weight(2f)
                         .fillMaxSize(),
                     textAlign = TextAlign.Center,
+                    fontSize = 12.ssp,
                 )
                 Button(
                     onClick = {
@@ -370,6 +388,7 @@ fun SettingScreen(
                 ) {
                     Text(
                         text = settingViewModel.isAppUsageGranted.let { if (it) "已開啟" else "未開啟" },
+                        fontSize = 12.ssp,
                     )
                 }
             }
@@ -384,6 +403,7 @@ fun SettingScreen(
                         .weight(2f)
                         .fillMaxSize(),
                     textAlign = TextAlign.Center,
+                    fontSize = 12.ssp,
                 )
 
                 Button(
@@ -398,7 +418,8 @@ fun SettingScreen(
                     )
                 ) {
                     Text(
-                        text = settingViewModel.isAccessibilityGranted.let { if (it) "已開啟" else "未開啟" }
+                        text = settingViewModel.isAccessibilityGranted.let { if (it) "已開啟" else "未開啟" },
+                        fontSize = 12.ssp,
                     )
                 }
             }
@@ -413,6 +434,7 @@ fun SettingScreen(
                         .weight(2f)
                         .fillMaxSize(),
                     textAlign = TextAlign.Center,
+                    fontSize = 12.ssp,
                 )
 
                 Button(
@@ -427,7 +449,8 @@ fun SettingScreen(
                     )
                 ) {
                     Text(
-                        text = settingViewModel.isNotificationListenerGranted.let { if (it) "已開啟" else "未開啟" }
+                        text = settingViewModel.isNotificationListenerGranted.let { if (it) "已開啟" else "未開啟" },
+                        fontSize = 12.ssp,
                     )
                 }
             }
@@ -442,6 +465,7 @@ fun SettingScreen(
                         .weight(2f)
                         .fillMaxSize(),
                     textAlign = TextAlign.Center,
+                    fontSize = 12.ssp,
                 )
                 Button(
                     onClick = {
@@ -449,12 +473,19 @@ fun SettingScreen(
                                  },
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(text = "前往")
+                    Text(
+                        text = "前往",
+                        fontSize = 12.ssp,
+                    )
                 }
             }
             Spacer(modifier = Modifier.padding(5.sdp))
 
-            Text(text = "確認上方資料都沒有問題後請您按下儲存")
+            Text(
+                text = "確認上方資料都沒有問題後\n請您按下儲存",
+                textAlign = TextAlign.Center,
+                fontSize = 12.ssp
+            )
 
             Spacer(modifier = Modifier.padding(5.sdp))
 
@@ -463,7 +494,7 @@ fun SettingScreen(
             ) {
                 Button(
                     onClick = {
-                        settingViewModel.onStoreAllChange()
+                        settingViewModel.onStoreOrEdit()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -471,7 +502,7 @@ fun SettingScreen(
                     ),
                     modifier = Modifier.weight(1f).padding(5.sdp),
                 ) {
-                    Text(text = "儲存設定")
+                    Text(text = if (settingViewModel.isEditing.value) "儲存設定" else "編輯設定")
                 }
 
                 Button(
@@ -489,7 +520,7 @@ fun SettingScreen(
                 }
             }
 
-            if(settingViewModel.phoneFoundLiveData.value == false || settingViewModel.miBandFoundLiveData.value == false) {
+            if(!settingViewModel.phoneFoundLiveData.value || !settingViewModel.miBandFoundLiveData.value) {
                 Spacer(modifier = Modifier.padding(5.sdp))
 
                 Row(
@@ -500,7 +531,7 @@ fun SettingScreen(
                         modifier = Modifier.weight(1f)
                     )
                     Icon(
-                        if (settingViewModel.phoneFoundLiveData.value == true) Icons.Default.Check else Icons.Default.Close,
+                        if (settingViewModel.phoneFoundLiveData.value) Icons.Default.Check else Icons.Default.Close,
                         contentDescription = "Search",
                         modifier = Modifier.weight(1f)
                     )
@@ -509,7 +540,7 @@ fun SettingScreen(
                         modifier = Modifier.weight(1f)
                     )
                     Icon(
-                        if (settingViewModel.miBandFoundLiveData.value == true) Icons.Default.Check else Icons.Default.Close,
+                        if (settingViewModel.miBandFoundLiveData.value) Icons.Default.Check else Icons.Default.Close,
                         contentDescription = "Search",
                         modifier = Modifier.weight(1f)
                     )

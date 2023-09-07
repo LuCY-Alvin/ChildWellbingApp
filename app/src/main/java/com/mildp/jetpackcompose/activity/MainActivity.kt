@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,10 +31,6 @@ import com.mildp.jetpackcompose.ui.components.UploadScreen
 import com.mildp.jetpackcompose.ui.theme.AppTheme
 import com.mildp.jetpackcompose.utils.Constants
 import com.mildp.jetpackcompose.utils.Helper
-import com.mildp.jetpackcompose.viewmodel.HomeViewModel
-import com.mildp.jetpackcompose.viewmodel.MibandViewModel
-import com.mildp.jetpackcompose.viewmodel.SettingViewModel
-import com.mildp.jetpackcompose.viewmodel.UploadViewModel
 import ir.kaaveh.sdpcompose.ssp
 
 
@@ -100,10 +95,6 @@ fun NavHostContainer(
     navController: NavHostController,
     padding: PaddingValues,
 ) {
-    val homeViewModel = viewModel<HomeViewModel>()
-    val settingViewModel = viewModel<SettingViewModel>()
-    val uploadViewModel = viewModel<UploadViewModel>()
-    val mibandViewModel = viewModel<MibandViewModel>()
 
     NavHost(
         navController = navController,
@@ -112,16 +103,16 @@ fun NavHostContainer(
 
         builder = {
             composable("home") {
-                HomeScreen(homeViewModel)
+                HomeScreen()
             }
             composable("setting") {
-                SettingScreen(settingViewModel)
+                SettingScreen()
             }
             composable("miband") {
-                MibandScreen(mibandViewModel)
+                MibandScreen()
             }
             composable("upload") {
-                UploadScreen(uploadViewModel)
+                UploadScreen()
             }
         }
     )

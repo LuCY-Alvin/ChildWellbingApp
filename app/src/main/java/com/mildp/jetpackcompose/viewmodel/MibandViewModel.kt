@@ -3,6 +3,7 @@ package com.mildp.jetpackcompose.viewmodel
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,8 +21,18 @@ class MibandViewModel:ViewModel() {
     private lateinit var packageManager: PackageManager
     var bandMacSet by mutableStateOf(kv.decodeString("bandMacSet","").toString())
 
+    private val _isEditing = mutableStateOf(kv.decodeBool("editMiband",true))
+    val isEditing: State<Boolean> = _isEditing
+
     fun onStored() {
         kv.encode("bandMacSet",formatMacAddress(bandMacSet))
+        kv.encode("editMiband",false)
+        _isEditing.value = false
+    }
+
+    fun onEdited(){
+        kv.encode("editMiband",true)
+        _isEditing.value = true
     }
 
     private fun formatMacAddress(mac: String): String {
@@ -61,5 +72,13 @@ class MibandViewModel:ViewModel() {
             false
         }
     }
+
+    fun onTutorialVideoClicked(videoId: String){
+        val videoUrl = "https://www.youtube.com/watch?v=$videoId"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        App.instance().startActivity(intent)
+    }
+
 }
 

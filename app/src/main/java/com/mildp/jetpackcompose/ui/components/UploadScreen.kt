@@ -22,9 +22,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun UploadScreen(
-    uploadViewModel: UploadViewModel = viewModel()
-) {
+fun UploadScreen() {
+    val uploadViewModel: UploadViewModel = viewModel()
+
     var progress by remember { mutableStateOf(0) }
     val progressLiveData = uploadViewModel.getUploadProgressLiveData().observeAsState()
 

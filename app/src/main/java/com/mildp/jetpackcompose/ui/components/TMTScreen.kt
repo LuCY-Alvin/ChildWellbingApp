@@ -50,9 +50,10 @@ import java.util.*
 
 @Composable
 fun TMTScreen(
-    tmtViewModel: TMTViewModel = viewModel(),
     navController: NavHostController
 ) {
+    val tmtViewModel: TMTViewModel = viewModel()
+
     val screenshotController = rememberScreenshotController()
     val sequence by tmtViewModel.sequenceLiveData.observeAsState(emptyArray())
     var size by remember { mutableStateOf(IntSize.Zero) }

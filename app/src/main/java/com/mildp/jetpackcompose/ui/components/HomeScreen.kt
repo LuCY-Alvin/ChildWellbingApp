@@ -20,9 +20,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(
-    homeViewModel: HomeViewModel = viewModel()
-) {
+fun HomeScreen() {
+    val homeViewModel: HomeViewModel = viewModel()
+
     Surface(
         modifier = Modifier,
         color = MaterialTheme.colorScheme.background
@@ -32,6 +32,7 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+
             if (homeViewModel.alarmStatus.isEmpty()) {
                 Icon(Icons.Default.Info, "請先進行設定", tint = MaterialTheme.colorScheme.error)
                 Text(text = "請先進行設定", color = MaterialTheme.colorScheme.error)
