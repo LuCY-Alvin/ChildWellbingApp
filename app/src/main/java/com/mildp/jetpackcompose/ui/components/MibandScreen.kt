@@ -152,7 +152,6 @@ class MacTransformation : VisualTransformation {
     private val offsetMapping = object : OffsetMapping {
         override fun originalToTransformed(offset: Int): Int {
             val colonCount = offset / 3
-            
             return offset + colonCount
         }
 
@@ -160,6 +159,7 @@ class MacTransformation : VisualTransformation {
             val colonCount = offset / 3
             return offset - colonCount
         }
+
     }
 }
 
