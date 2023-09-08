@@ -1,5 +1,8 @@
 package com.mildp.jetpackcompose.viewmodel
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
@@ -7,11 +10,13 @@ import androidx.lifecycle.ViewModel
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.activity.SurveyActivity
 import com.mildp.jetpackcompose.model.AlarmStatus
+import com.mildp.jetpackcompose.receiver.StopExpReceiver
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import java.util.*
 
 class HomeViewModel: ViewModel() {
 
@@ -66,6 +71,25 @@ class HomeViewModel: ViewModel() {
         return isAppUsageGranted &&
                 isAccessibilityGranted &&
                 isNotificationListenerGranted
+    }
+
+    fun onStopExp(){
+        val alarmIntent = Intent(App.instance(), StopExpReceiver::class.java)
+        val alarmManager = App.instance().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmIntent.action = "stopExp"
+        val calendar: Calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 1)
+
+        val pendingIntent =
+            PendingIntent.getBroadcast(App.instance(), calendar.timeInMillis.toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
+        Helper().log(TAG,"I will end the exp @ ${Helper().timeString(calendar.timeInMillis)}")
     }
 
 }

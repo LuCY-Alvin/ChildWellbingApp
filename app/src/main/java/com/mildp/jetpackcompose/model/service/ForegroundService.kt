@@ -270,10 +270,18 @@ class ForegroundService : Service(), MyListener {
         unregisterReceiver(mReceiver)
         releaseWakeLock()
         Helper().log(TAG, "app被關閉: Restart Receiver")
-        val broadcastIntent = Intent()
-        broadcastIntent.action = "restart_service"
-        broadcastIntent.setClass(this, RestartReceiver::class.java)
-        this.sendBroadcast(broadcastIntent)
+
+        val stopExp = kv.decodeBool("stopExp", false)
+
+        if(!stopExp) {
+            val broadcastIntent = Intent()
+            broadcastIntent.action = "restart_service"
+            broadcastIntent.setClass(this, RestartReceiver::class.java)
+            this.sendBroadcast(broadcastIntent)
+        } else {
+            bleJob.cancel()
+            checkPermissionJob.cancel()
+        }
 
         super.onDestroy()
     }

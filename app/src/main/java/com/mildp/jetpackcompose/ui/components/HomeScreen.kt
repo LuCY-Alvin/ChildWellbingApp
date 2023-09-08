@@ -47,7 +47,7 @@ fun HomeScreen() {
 
                 Spacer(modifier = Modifier.padding(5.sdp))
 
-                Countdown(alarmStatus = homeViewModel.alarmStatus)
+                Countdown(alarmStatus = homeViewModel.alarmStatus, homeViewModel = homeViewModel)
 
                 AlarmChecklist(alarmStatus = homeViewModel.alarmStatus)
 
@@ -119,7 +119,10 @@ fun formatTime(milliseconds: Long): String {
 }
 
 @Composable
-fun Countdown(alarmStatus: MutableList<Pair<Long, AlarmStatus>>) {
+fun Countdown(
+    alarmStatus: MutableList<Pair<Long, AlarmStatus>>,
+    homeViewModel: HomeViewModel
+) {
     val currentTime = System.currentTimeMillis()
 
     val closestTimestamp = alarmStatus
@@ -144,6 +147,18 @@ fun Countdown(alarmStatus: MutableList<Pair<Long, AlarmStatus>>) {
             fontSize = 40.ssp,
             color = MaterialTheme.colorScheme.primary
         )
+
+        Spacer(modifier = Modifier.padding(5.sdp))
+
+        Button(
+            onClick = { homeViewModel.onStopExp() },
+            modifier = Modifier
+                .padding(5.sdp),
+        ) {
+            Text(
+                text = "實驗結束",
+            )
+        }
     }
 }
 

@@ -118,6 +118,14 @@
             android:name=".receiver.ScreenReceiver"
             android:enabled="true"
             android:exported="false" />
+        <receiver
+            android:name=".receiver.StopExpReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="stopExp" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".activity.MainActivity"
