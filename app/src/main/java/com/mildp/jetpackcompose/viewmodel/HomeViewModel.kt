@@ -89,6 +89,8 @@ class HomeViewModel: ViewModel() {
             calendar.timeInMillis,
             pendingIntent
         )
+
+        Toast.makeText(App.instance(),"將在 ${Helper().timeString(calendar.timeInMillis)} 結束實驗", Toast.LENGTH_SHORT).show()
         Helper().log(TAG,"I will end the exp @ ${Helper().timeString(calendar.timeInMillis)}")
     }
 

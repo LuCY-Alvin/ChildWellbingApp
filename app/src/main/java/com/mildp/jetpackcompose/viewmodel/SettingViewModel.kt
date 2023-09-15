@@ -167,6 +167,7 @@ class SettingViewModel: ViewModel() {
             intent.data = Uri.parse("package:$packageName")
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             App.instance().startActivity(intent)
+            saveBatteryOptimizeState(true)
         } else {
             saveBatteryOptimizeState(true)
             Toast.makeText(App.instance(),"已關閉省電最佳化",Toast.LENGTH_SHORT).show()
