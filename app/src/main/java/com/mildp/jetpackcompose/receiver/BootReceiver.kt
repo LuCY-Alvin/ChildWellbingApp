@@ -47,9 +47,10 @@ class BootReceiver : BroadcastReceiver() {
         }
 
         alarmStatus.forEachIndexed { index, (timeInMillis, completed) ->
-            if (timeInMillis + 2 * 60 * 60 * 1000 > bootTimeInMillis && completed == AlarmStatus.PREPARING) {
+            if (timeInMillis + 2 * 60 * 60 * 1000 > bootTimeInMillis) {
+                alarmStatus[index] = timeInMillis to AlarmStatus.PREPARING
                 Helper().setAlarm(TAG, timeInMillis)
-            } else if (completed == AlarmStatus.FINISHED) {
+            } else if (timeInMillis + 2 * 60 * 60 * 1000 < bootTimeInMillis && completed == AlarmStatus.FINISHED) {
                 alarmStatus[index] = timeInMillis to AlarmStatus.FINISHED
             } else {
                 alarmStatus[index] = timeInMillis to AlarmStatus.MISSED

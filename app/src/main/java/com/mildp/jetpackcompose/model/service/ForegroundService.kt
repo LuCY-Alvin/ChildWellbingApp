@@ -68,7 +68,9 @@ class ForegroundService : Service(), MyListener {
 
         mybroadcast = kv.decodeString("MyBroadcast","").toString()
         partnerbroadcast = kv.decodeString("PartnerBroadcast","").toString()
+        val bandMac = kv.decodeString("bandMacSet","")
         Helper().log(TAG,"我的廣播：$mybroadcast、伴侶的廣播：$partnerbroadcast")
+        Helper().log(TAG,"手環的廣播：$bandMac")
 
         NotificationListener().setListener(this)
 
@@ -100,7 +102,7 @@ class ForegroundService : Service(), MyListener {
         }
 
         bleJob = repeatScanAndAdvertise()
-        checkPermissionJob = repeatCheckPermission()
+        //checkPermissionJob = repeatCheckPermission()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -231,6 +233,8 @@ class ForegroundService : Service(), MyListener {
             task.addOnFailureListener {
                 Helper().log(TAG, "Activity recognition request failed: $it")
             }
+        } else {
+            Helper().log(TAG, "Is Activity recognition permission granted?")
         }
     }
 

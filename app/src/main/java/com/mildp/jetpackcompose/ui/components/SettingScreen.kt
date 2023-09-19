@@ -479,7 +479,31 @@ fun SettingScreen() {
                     )
                 }
             }
-            Spacer(modifier = Modifier.padding(5.sdp))
+
+            Row(
+                modifier = Modifier,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "請依照實驗者指示再使用",
+                    modifier = Modifier
+                        .weight(2f)
+                        .fillMaxSize(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 12.ssp,
+                )
+                Button(
+                    onClick = {
+                        settingViewModel.resetUnfinishedAlarms()
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(
+                        text = "測驗重置",
+                        fontSize = 12.ssp,
+                    )
+                }
+            }
 
             Text(
                 text = "確認上方資料都沒有問題後\n請您按下儲存",

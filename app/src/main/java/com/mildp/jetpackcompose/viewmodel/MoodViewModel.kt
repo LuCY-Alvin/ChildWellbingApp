@@ -116,7 +116,9 @@ class MoodViewModel : ViewModel() {
 
             App.instance().dataDao.insertMood(moodData)
 
-            val firstFalseIndex = alarmStatus.indexOfFirst { it.second == AlarmStatus.PREPARING }
+            val nowTimeInMillis = System.currentTimeMillis()
+            val firstFalseIndex = alarmStatus.indexOfFirst { it.first + 2 * 60 * 60 * 1000 > nowTimeInMillis }
+
             if (firstFalseIndex >= 0) {
                 alarmStatus[firstFalseIndex] = Pair(alarmStatus[firstFalseIndex].first, AlarmStatus.FINISHED)
                 val updatedAlarmStatusJson = Json.encodeToString(alarmStatus)
@@ -124,7 +126,6 @@ class MoodViewModel : ViewModel() {
             }
 
             if (currentTime in LocalTime.of(19, 0)..LocalTime.of(23, 59)) {
-
                 kv.encode("uploadServiceReady", true)
                 Helper().log(TAG,"Upload Ready!!")
 
@@ -132,7 +133,6 @@ class MoodViewModel : ViewModel() {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 App.instance().startActivity(intent)
                 Toast.makeText(App.instance(),"感謝完成今日測驗，準備上傳今日資料",Toast.LENGTH_SHORT).show()
-
             } else {
                 val intent = Intent(App.instance(), MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -143,8 +143,8 @@ class MoodViewModel : ViewModel() {
         } else {
 
             App.instance().dataDao.insertMood(moodData)
-
             kv.encode("childSurveyDone", true)
+
             val intent = Intent(App.instance(), MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             App.instance().startActivity(intent)

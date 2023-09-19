@@ -24,6 +24,7 @@ import com.google.firebase.ktx.Firebase
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.service.ForegroundService
+import com.mildp.jetpackcompose.receiver.BootReceiver
 import com.mildp.jetpackcompose.utils.Constants.NOTIFICATION_ID
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
@@ -403,5 +404,30 @@ class SettingViewModel: ViewModel() {
         }
 
         return false
+    }
+
+    fun resetUnfinishedAlarms() {
+
+        val nowTimeInMillis = System.currentTimeMillis()
+        val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
+        val alarmStatus: MutableList<Pair<Long, AlarmStatus>> = if (storedAlarmStatusJson != null) {
+            Json.decodeFromString(storedAlarmStatusJson)
+        } else {
+            mutableListOf()
+        }
+
+        alarmStatus.forEachIndexed { index, (timeInMillis, completed) ->
+            if (timeInMillis + 2 * 60 * 60 * 1000 > nowTimeInMillis) {
+                alarmStatus[index] = timeInMillis to AlarmStatus.PREPARING
+                Helper().setAlarm(TAG, timeInMillis)
+            } else if (timeInMillis + 2 * 60 * 60 * 1000 < nowTimeInMillis && completed == AlarmStatus.FINISHED) {
+                alarmStatus[index] = timeInMillis to AlarmStatus.FINISHED
+            } else {
+                alarmStatus[index] = timeInMillis to AlarmStatus.MISSED
+            }
+        }
+
+        val updatedAlarmStatusJson = Json.encodeToString(alarmStatus)
+        kv.encode("alarmStatus", updatedAlarmStatusJson)
     }
 }

@@ -36,7 +36,9 @@ class HomeViewModel: ViewModel() {
 
     fun onSurveyStarted(participant: String){
         val currentTime = System.currentTimeMillis()
-        val pendingAlarm = alarmStatus.firstOrNull { it.second == AlarmStatus.PREPARING }
+        val pendingAlarm = alarmStatus.firstOrNull {
+            it.first + 2 * 60 * 60 * 1000 > currentTime && it.second == AlarmStatus.PREPARING
+        }
 
         if (pendingAlarm != null) {
             if(permissionCheck()) {
