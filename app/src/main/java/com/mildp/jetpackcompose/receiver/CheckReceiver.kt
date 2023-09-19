@@ -20,6 +20,7 @@ class CheckReceiver : BroadcastReceiver() {
         private const val NOTIFICATION_ID_USAGE = 26
         private const val NOTIFICATION_ID_ACCESSIBILITY = 27
         private const val NOTIFICATION_ID_NOTIFICATION_PERMISSION = 28
+        private const val NOTIFICATION_ID_SERVICE = 29
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -57,6 +58,11 @@ class CheckReceiver : BroadcastReceiver() {
                 notification.setContentText("您的權限可能被系統關閉，盼請您開啟應用程式設定。重新設定後可以直接滑掉此通知")
                 checkManager.notify(NOTIFICATION_ID_NOTIFICATION_PERMISSION, notification.build())
                 Helper().log(TAG, "未打開通知設定")
+            }
+            "Service_Stopped" -> {
+                notification.setContentText("您的實驗可能被關閉，盼請您進入App設定頁面按下開始實驗。重新設定後可以直接滑掉此通知")
+                checkManager.notify(NOTIFICATION_ID_SERVICE, notification.build())
+                Helper().log(TAG, "Service關閉")
             }
         }
     }

@@ -21,6 +21,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mildp.jetpackcompose.App
+import com.mildp.jetpackcompose.utils.Constants
 import com.mildp.jetpackcompose.viewmodel.SettingViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
@@ -37,6 +39,9 @@ import java.time.format.DateTimeFormatter
 fun SettingScreen() {
     val scrollState = rememberScrollState()
     val settingViewModel: SettingViewModel = viewModel()
+
+    val phoneFound = Constants.kv.decodeBool("phoneFound", false)
+    val mibandFound = Constants.kv.decodeBool("mibandFound", false)
 
     settingViewModel.checkPermission()
 
@@ -538,13 +543,13 @@ fun SettingScreen() {
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ),
                     modifier = Modifier.weight(1f).padding(5.sdp),
-                    enabled = !settingViewModel.serviceStarted()
+                    enabled = !settingViewModel.isMyServiceRunning(App.instance())
                 ) {
                     Text(text = "開始實驗")
                 }
             }
 
-            if(!settingViewModel.phoneFoundLiveData.value || !settingViewModel.miBandFoundLiveData.value) {
+            if(!phoneFound || !mibandFound) {
                 Spacer(modifier = Modifier.padding(5.sdp))
 
                 Row(
@@ -555,7 +560,7 @@ fun SettingScreen() {
                         modifier = Modifier.weight(1f)
                     )
                     Icon(
-                        if (settingViewModel.phoneFoundLiveData.value) Icons.Default.Check else Icons.Default.Close,
+                        if (phoneFound) Icons.Default.Check else Icons.Default.Close,
                         contentDescription = "Search",
                         modifier = Modifier.weight(1f)
                     )
@@ -564,7 +569,7 @@ fun SettingScreen() {
                         modifier = Modifier.weight(1f)
                     )
                     Icon(
-                        if (settingViewModel.miBandFoundLiveData.value) Icons.Default.Check else Icons.Default.Close,
+                        if (mibandFound) Icons.Default.Check else Icons.Default.Close,
                         contentDescription = "Search",
                         modifier = Modifier.weight(1f)
                     )

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.mildp.jetpackcompose.App
+import com.mildp.jetpackcompose.model.service.ForegroundService
 import com.mildp.jetpackcompose.model.service.UploadService
 import com.mildp.jetpackcompose.utils.Constants.NOTIFICATION_ID3
 import com.mildp.jetpackcompose.utils.Constants.kv
@@ -16,6 +17,7 @@ class Routine : BroadcastReceiver() {
 
     companion object {
         private const val TAG: String = "RoutineReceiver"
+        private const val NOTIFICATION_ID_SERVICE = 29
     }
     private val cancelManager by lazy { App.instance().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
 
@@ -55,6 +57,14 @@ class Routine : BroadcastReceiver() {
                 cancelManager.cancel(NOTIFICATION_ID3)
             }
 
+            Helper().checkPermission(
+                isMyServiceRunning(App.instance()),
+                TAG,
+                "實驗被關閉",
+                "Service_Stopped",
+                NOTIFICATION_ID_SERVICE
+            )
+
         } catch (e:Exception) {
             Helper().log(TAG,"Error in WorkManager: $e")
         }
@@ -71,5 +81,16 @@ class Routine : BroadcastReceiver() {
             marketIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(marketIntent)
         }
+    }
+
+    private fun isMyServiceRunning(context: Context): Boolean {
+        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val services = manager.getRunningServices(Integer.MAX_VALUE)
+        for (service in services) {
+            if (ForegroundService::class.java.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 }

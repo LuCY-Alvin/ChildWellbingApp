@@ -1,7 +1,7 @@
 package com.mildp.jetpackcompose.viewmodel
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
+import android.app.ActivityManager
 import android.bluetooth.BluetoothManager
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -24,8 +24,6 @@ import com.google.firebase.ktx.Firebase
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.service.ForegroundService
-import com.mildp.jetpackcompose.receiver.BootReceiver
-import com.mildp.jetpackcompose.utils.Constants.NOTIFICATION_ID
 import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
 import kotlinx.coroutines.*
@@ -51,14 +49,6 @@ class SettingViewModel: ViewModel() {
     var pickedMorning: LocalTime by mutableStateOf(LocalTime.of(8,0))
     var pickedAfternoon: LocalTime by mutableStateOf(LocalTime.of(14,0))
     var pickedNight: LocalTime by mutableStateOf(LocalTime.of(20,0))
-
-    private var checkJob: Job = Job()
-
-    private val _phoneFoundLiveData = mutableStateOf(kv.decodeBool("phoneFound",false))
-    val phoneFoundLiveData: State<Boolean> = _phoneFoundLiveData
-
-    private val _miBandFoundLiveData = mutableStateOf(kv.decodeBool("mibandFound",false))
-    val miBandFoundLiveData: State<Boolean> = _miBandFoundLiveData
 
     private val storedAlarmStatusJson = kv.decodeString("alarmStatus", null)
     @OptIn(ExperimentalSerializationApi::class)
@@ -359,7 +349,6 @@ class SettingViewModel: ViewModel() {
             Toast.makeText(App.instance(), "請先設定小米手環", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(App.instance(), "測驗將在您設定的時間通知您", Toast.LENGTH_SHORT).show()
-            checkJob = scanCheckTask()
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 App.instance().startForegroundService(Intent(App.instance(), ForegroundService::class.java))
@@ -369,43 +358,18 @@ class SettingViewModel: ViewModel() {
         }
     }
 
-    private fun scanCheckTask(): Job{
-        return CoroutineScope(Dispatchers.Main + checkJob).launch {
-            while (isActive) {
-                val uuidScan = kv.decodeString("uuidScan", "")
-                val uuidSet = kv.decodeString("PartnerBroadcast", "")
-                val bandMacScan = kv.decodeString("bandMacScan", "")
-                val bandMacSet = kv.decodeString("bandMacSet", "")
-                withContext(Dispatchers.Main) {
-                    if (uuidScan == "[$uuidSet]") {
-                        _phoneFoundLiveData.value = true
-                        kv.encode("phoneFound",true)
-                    } else if (bandMacScan == bandMacSet) {
-                        _miBandFoundLiveData.value = true
-                        kv.encode("mibandFound",true)
-                    } else {
-                        Helper().log(TAG,"尚未尋得")
-                    }
-                }
-                if (phoneFoundLiveData.value && miBandFoundLiveData.value) {
-                    break
-                }
-                delay(3000L)
+    fun isMyServiceRunning(context: Context): Boolean {
+        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val services = manager.getRunningServices(Integer.MAX_VALUE)
+        for (service in services) {
+            if (ForegroundService::class.java.name == service.service.className) {
+                return true
             }
         }
-    }
-
-    fun serviceStarted(): Boolean{
-        val notificationManager: NotificationManager =
-            App.instance().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        for (notification in notificationManager.activeNotifications){
-            return notification.id == NOTIFICATION_ID
-        }
-
         return false
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     fun resetUnfinishedAlarms() {
 
         val nowTimeInMillis = System.currentTimeMillis()

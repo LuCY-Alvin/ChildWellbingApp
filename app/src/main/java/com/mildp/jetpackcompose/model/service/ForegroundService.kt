@@ -19,7 +19,6 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.receiver.ActivityRecognitionReceiver
-import com.mildp.jetpackcompose.receiver.CheckReceiver
 import com.mildp.jetpackcompose.receiver.RestartReceiver
 import com.mildp.jetpackcompose.receiver.ScreenReceiver
 import com.mildp.jetpackcompose.utils.Constants.CHANNEL_ID
@@ -102,7 +101,7 @@ class ForegroundService : Service(), MyListener {
         }
 
         bleJob = repeatScanAndAdvertise()
-        //checkPermissionJob = repeatCheckPermission()
+        checkPermissionJob = repeatCheckPermission()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -144,10 +143,7 @@ class ForegroundService : Service(), MyListener {
         return CoroutineScope(Dispatchers.IO + checkPermissionJob).launch {
             while(true){
                 check()
-                sensorViewModel.startSensors()
-                delay(30 * 1000)
-                sensorViewModel.stopSensors()
-                delay(270 * 1000)
+                delay(5 * 60 * 1000)
             }
         }
     }
@@ -157,16 +153,18 @@ class ForegroundService : Service(), MyListener {
 
         val bluetoothManager = App.instance().getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         val mBluetoothAdapter = bluetoothManager?.adapter
-        checkPermission(
+        Helper().checkPermission(
             mBluetoothAdapter?.isEnabled == false,
+            TAG,
             "藍芽被關閉",
             "BlueTooth",
             NOTIFICATION_ID_BLUETOOTH
         )
 
         val gpsManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        checkPermission(
+        Helper().checkPermission(
             gpsManager.isProviderEnabled(LocationManager.GPS_PROVIDER),
+            TAG,
             "GPS被關閉",
             "GPS",
             NOTIFICATION_ID_GPS
@@ -174,8 +172,9 @@ class ForegroundService : Service(), MyListener {
 
         Helper().permissionCheck(App.instance(), TAG,"appUsage")
         val appUsageCheck = kv.decodeBool("isAppUsageGranted",false)
-        checkPermission(
+        Helper().checkPermission(
             appUsageCheck,
+            TAG,
             "應用程式設定被關閉",
             "Usage_Permission",
             NOTIFICATION_ID_USAGE
@@ -183,8 +182,9 @@ class ForegroundService : Service(), MyListener {
 
         Helper().permissionCheck(App.instance(), TAG,"accessibilityService")
         val accessibilityCheck = kv.decodeBool("isAccessibilityGranted",false)
-        checkPermission(
+        Helper().checkPermission(
             accessibilityCheck,
+            TAG,
             "無障礙設定被關閉",
             "Accessibility_Permission",
             NOTIFICATION_ID_ACCESSIBILITY
@@ -192,29 +192,13 @@ class ForegroundService : Service(), MyListener {
 
         Helper().permissionCheck(App.instance(), TAG,"notificationService")
         val notificationCheck = kv.decodeBool("isNotificationListenerGranted",false)
-        checkPermission(
-                notificationCheck,
-                "存取通知設定被關閉",
-                "Notification_Permission",
-                NOTIFICATION_ID_NOTIFICATION_PERMISSION
-            )
-    }
-
-    private fun checkPermission(
-        checkBoolean:Boolean,
-        logText: String,
-        action: String,
-        notificationId: Int
-    ) {
-        val checkManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if(!checkBoolean) {
-            Helper().log(TAG,logText)
-            val statusIntent = Intent()
-            statusIntent.action = action
-            statusIntent.setClass(this,CheckReceiver::class.java)
-        } else {
-            checkManager.cancel(notificationId)
-        }
+        Helper().checkPermission(
+            notificationCheck,
+            TAG,
+            "存取通知設定被關閉",
+            "Notification_Permission",
+            NOTIFICATION_ID_NOTIFICATION_PERMISSION
+        )
     }
 
 ////ActivityRecognition Function/////

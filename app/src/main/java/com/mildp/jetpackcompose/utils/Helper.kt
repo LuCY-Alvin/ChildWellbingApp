@@ -21,6 +21,7 @@ import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.database.Debug
 import com.mildp.jetpackcompose.model.service.AccessibilityService
+import com.mildp.jetpackcompose.receiver.CheckReceiver
 import com.mildp.jetpackcompose.receiver.MyAlarm
 import com.mildp.jetpackcompose.utils.Constants.NOTIFICATION_ID2
 import com.mildp.jetpackcompose.utils.Constants.kv
@@ -83,6 +84,24 @@ class Helper {
                 log(TAG, "Accessibility service permission is ${if (accessibilityServiceGranted) "granted" else "not granted"}")
                 kv.encode("isAccessibilityGranted", accessibilityServiceGranted)
             }
+        }
+    }
+
+    fun checkPermission(
+        checkBoolean:Boolean,
+        TAG: String,
+        logText: String,
+        action: String,
+        notificationId: Int
+    ) {
+        val checkManager = App.instance().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if(!checkBoolean) {
+            log(TAG,logText)
+            val statusIntent = Intent()
+            statusIntent.action = action
+            statusIntent.setClass(App.instance(), CheckReceiver::class.java)
+        } else {
+            checkManager.cancel(notificationId)
         }
     }
 

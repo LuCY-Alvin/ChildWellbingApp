@@ -97,10 +97,10 @@ class BleScanViewModel(application: Application): AndroidViewModel(application) 
             val partnerUUID = Constants.kv.decodeString("PartnerBroadcast","")
             val bandMacSet = Constants.kv.decodeString("bandMacSet","")
             if (uuid == "[$partnerUUID]") {
-                Constants.kv.encode("uuidScan", uuid)
+                Constants.kv.encode("phoneFound", true)
                 Constants.kv.encode("partnerMac", macAddress)
             } else if (macAddress == bandMacSet) {
-                Constants.kv.encode("bandMacScan", macAddress)
+                Constants.kv.encode("mibandFound", true)
             }
 
             val updatedDevices = _scannedDevices.value?.toMutableList() ?: mutableListOf()
