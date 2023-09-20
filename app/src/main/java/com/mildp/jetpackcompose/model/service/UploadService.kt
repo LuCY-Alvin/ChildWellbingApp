@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.work.WorkManager
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.R
 import com.mildp.jetpackcompose.model.database.DataBase
@@ -145,11 +146,15 @@ class UploadService : Service() {
                                 if (uploadMap.values.all { it }) {
                                     manager.cancel(NOTIFICATION_ID3)
                                     kv.encode("uploadServiceReady", false)
+                                    if(Helper().databaseDay() == 8){
+                                        WorkManager.getInstance(App.instance()).cancelUniqueWork("worker")
+                                    }
                                 }
                             }
                         }
                     } catch (e: Exception) {
                         Helper().log(TAG,"There's Error In Response:$e")
+                        kv.encode("uploadServiceReady",true)
                     } finally {
                         response.close()
                     }

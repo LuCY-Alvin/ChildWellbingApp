@@ -1,6 +1,7 @@
 package com.mildp.jetpackcompose.activity
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -35,11 +36,13 @@ import ir.kaaveh.sdpcompose.ssp
 
 
 class MainActivity : ComponentActivity() {
+    private lateinit var navController: NavHostController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                val navController = rememberNavController()
+                navController = rememberNavController()
 
                 Scaffold(
                     bottomBar = {
@@ -52,6 +55,16 @@ class MainActivity : ComponentActivity() {
         }
         onPermissionGranted()
         Helper().myWorkManager()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let {
+            when(it.action){
+                "setting" -> navController.navigate("setting")
+                "miband" -> navController.navigate("miband")
+            }
+        }
     }
 
     private fun onPermissionGranted() {

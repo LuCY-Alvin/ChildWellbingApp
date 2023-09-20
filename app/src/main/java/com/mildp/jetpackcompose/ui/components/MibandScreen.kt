@@ -10,11 +10,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.viewmodel.MibandViewModel
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
@@ -63,7 +65,6 @@ fun MibandScreen() {
             mibandViewModel = mibandViewModel,
             videoId = "GMGZ9l2rg9I"
         )
-
 
         TutorialBox(
             title = "手環資料匯出",
@@ -171,14 +172,15 @@ fun TutorialBox(
     videoId: String
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val sync = kv.decodeBool("uploadServiceReady", true)
 
     Column(
         modifier = Modifier
             .clickable { isExpanded = !isExpanded }
             .padding(10.sdp)
             .border(
-                BorderStroke(1.sdp, MaterialTheme.colorScheme.outline),
-                shape = MaterialTheme.shapes.medium
+                BorderStroke(1.sdp, color = if(sync && title == "同步手環資料") Color.Red else MaterialTheme.colorScheme.outline),
+                shape = MaterialTheme.shapes.medium,
             ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -186,7 +188,8 @@ fun TutorialBox(
             text = title,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(1.sdp)
+            modifier = Modifier.padding(1.sdp),
+            color = if(sync && title == "同步手環資料") Color.Red else MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = Modifier.height(4.sdp))
@@ -198,7 +201,8 @@ fun TutorialBox(
                 text = content,
                 modifier = Modifier.padding(all = 8.sdp),
                 maxLines = if (isExpanded) Int.MAX_VALUE else 1,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = if(sync && title == "同步手環資料") Color.Red else MaterialTheme.colorScheme.onBackground
             )
         }
 

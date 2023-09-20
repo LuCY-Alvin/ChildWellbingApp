@@ -131,11 +131,13 @@ class MoodViewModel : ViewModel() {
 
                 val intent = Intent(App.instance(), MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                intent.action = "miband"
                 App.instance().startActivity(intent)
-                Toast.makeText(App.instance(),"感謝完成今日測驗，準備上傳今日資料",Toast.LENGTH_SHORT).show()
+                Toast.makeText(App.instance(),"感謝完成今日測驗，準備上傳今日資料，也請記得同步手環資料",Toast.LENGTH_SHORT).show()
             } else {
                 val intent = Intent(App.instance(), MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                intent.action = "setting"
                 App.instance().startActivity(intent)
                 Toast.makeText(App.instance(),"感謝完成本次測驗",Toast.LENGTH_SHORT).show()
             }

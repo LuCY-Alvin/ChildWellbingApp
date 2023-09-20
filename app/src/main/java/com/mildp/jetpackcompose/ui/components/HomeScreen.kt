@@ -12,14 +12,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.AlarmStatus
-import com.mildp.jetpackcompose.utils.Helper
 import com.mildp.jetpackcompose.viewmodel.HomeViewModel
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 @Composable
 fun HomeScreen() {
     val homeViewModel: HomeViewModel = viewModel()

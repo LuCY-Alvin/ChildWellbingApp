@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.mildp.jetpackcompose.model.service.ForegroundService
+import com.mildp.jetpackcompose.model.service.UploadService
 import com.mildp.jetpackcompose.utils.Constants.kv
 
 class StopExpReceiver : BroadcastReceiver() {
@@ -13,5 +14,7 @@ class StopExpReceiver : BroadcastReceiver() {
         stopIntent.action = "stopExp"
         kv.encode("stopExp",true)
         context.stopService(stopIntent)
+
+        context.startService(Intent(context, UploadService::class.java))
     }
 }
