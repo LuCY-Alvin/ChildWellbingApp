@@ -77,6 +77,8 @@ class NotificationHelper(private val context: Context) {
 
         val notification = NotificationCompat
             .Builder(context, Constants.CHANNEL_ID)
+            .setContentTitle("台大心理系幸福感研究")
+            .setContentText("實驗進行中...")
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setContentIntent(pendingIntent)

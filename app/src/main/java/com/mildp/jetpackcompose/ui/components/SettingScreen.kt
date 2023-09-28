@@ -545,7 +545,10 @@ fun SettingScreen() {
                     modifier = Modifier.weight(1f).padding(5.sdp),
                     enabled = !settingViewModel.isMyServiceRunning(App.instance())
                 ) {
-                    Text(text = "開始實驗")
+                    Text(text =
+                        if (!settingViewModel.isMyServiceRunning(App.instance())) "開始實驗"
+                        else "實驗進行中"
+                    )
                 }
             }
 
