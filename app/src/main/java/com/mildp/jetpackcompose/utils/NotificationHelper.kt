@@ -62,6 +62,8 @@ class NotificationHelper(private val context: Context) {
             .build()
 
         notificationManager.notify(Constants.NOTIFICATION_ID2,notification)
+        Helper().log(TAG,"Survey Appear @ ${System.currentTimeMillis()}")
+
         kv.encode("surveyCancelled",false)
 
         Helper().scheduleNotificationDismissal(notificationManager, 2 * 60 * 60 * 1000, TAG)

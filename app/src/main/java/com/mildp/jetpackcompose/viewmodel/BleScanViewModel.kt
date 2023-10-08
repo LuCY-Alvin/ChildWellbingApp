@@ -73,8 +73,10 @@ class BleScanViewModel(application: Application): AndroidViewModel(application) 
                         Manifest.permission.BLUETOOTH_SCAN
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    device.name?.let { name ->
-                        map["name"] = name
+                    if(device.name == null){
+                        map["name"] = "partnerPhone"
+                    } else {
+                        map["name"] = device.name
                     }
                     map["RSSI"] = rssi.toString()
                     map["time"] = Helper().timeString(rxTimestampMillis)
@@ -82,8 +84,10 @@ class BleScanViewModel(application: Application): AndroidViewModel(application) 
                     Helper().log(TAG,"You don't have the permission to scan")
                 }
             } else {
-                device.name?.let { name ->
-                    map["name"] = name
+                if(device.name == null){
+                    map["name"] = "partnerPhone"
+                } else {
+                    map["name"] = device.name
                 }
                 map["RSSI"] = rssi.toString()
                 map["time"] = Helper().timeString(rxTimestampMillis)

@@ -100,6 +100,7 @@ class Helper {
             val statusIntent = Intent()
             statusIntent.action = action
             statusIntent.setClass(App.instance(), CheckReceiver::class.java)
+            App.instance().sendBroadcast(statusIntent)
         } else {
             checkManager.cancel(notificationId)
         }
@@ -165,6 +166,8 @@ class Helper {
             delay(timeMillis)
             val surveyCancelled = kv.decodeBool("surveyCancelled", false)
             if (!surveyCancelled) {
+                log(TAG,"Survey AutoRemove @ ${System.currentTimeMillis()}")
+
                 notificationManager.cancel(NOTIFICATION_ID2)
                 kv.encode("surveyCancelled",true)
 
@@ -183,7 +186,7 @@ class Helper {
                     kv.encode("alarmStatus", updatedAlarmStatusJson)
                 }
             } else {
-                log(TAG, "通知已取消")
+                log(TAG, "通知已取消 @ ${System.currentTimeMillis()}")
             }
         }
     }

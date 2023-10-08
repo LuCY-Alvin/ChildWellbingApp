@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.R
 import com.mildp.jetpackcompose.activity.MainActivity
+import com.mildp.jetpackcompose.activity.SurveyActivity
 import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.model.database.MoodData
 import com.mildp.jetpackcompose.model.database.UsageData
@@ -129,15 +130,15 @@ class MoodViewModel : ViewModel() {
                 kv.encode("uploadServiceReady", true)
                 Helper().log(TAG,"Upload Ready!!")
 
-                val intent = Intent(App.instance(), MainActivity::class.java)
+                val intent = Intent(App.instance(),SurveyActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.action = "miband"
+                intent.action = "goBackMain"
                 App.instance().startActivity(intent)
                 Toast.makeText(App.instance(),"感謝完成今日測驗，準備上傳今日資料，也請記得同步手環資料",Toast.LENGTH_SHORT).show()
             } else {
-                val intent = Intent(App.instance(), MainActivity::class.java)
+                val intent = Intent(App.instance(), SurveyActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.action = "setting"
+                intent.action = "goBackMain"
                 App.instance().startActivity(intent)
                 Toast.makeText(App.instance(),"感謝完成本次測驗",Toast.LENGTH_SHORT).show()
             }

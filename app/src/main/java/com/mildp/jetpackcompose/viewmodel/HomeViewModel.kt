@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.mildp.jetpackcompose.App
-import com.mildp.jetpackcompose.activity.SurveyActivity
+import com.mildp.jetpackcompose.activity.MainActivity
 import com.mildp.jetpackcompose.model.AlarmStatus
 import com.mildp.jetpackcompose.receiver.StopExpReceiver
 import com.mildp.jetpackcompose.utils.Constants.kv
@@ -46,7 +46,8 @@ class HomeViewModel: ViewModel() {
 
                 if (currentTime >= pendingAlarm.first && currentTime <= twoHoursAfterSurveyStart) {
                     kv.encode("Participant", participant)
-                    val intent = Intent(App.instance(), SurveyActivity::class.java)
+                    val intent = Intent(App.instance(), MainActivity::class.java)
+                    intent.action = "startSurvey"
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     App.instance().startActivity(intent)
                 } else {

@@ -1,5 +1,6 @@
 package com.mildp.jetpackcompose.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.ui.components.HanderScreen
 import com.mildp.jetpackcompose.ui.components.MoodScreen
 import com.mildp.jetpackcompose.ui.components.TMTScreen
@@ -44,6 +46,16 @@ class SurveyActivity : ComponentActivity() {
         sensorViewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
             .create(SensorViewModel::class.java)
         sensorViewModel.startSensors()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if(intent?.action == "goBackMain"){
+            val goBackIntent = Intent(this, MainActivity::class.java)
+            goBackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            this.startActivity(goBackIntent)
+            finish()
+        }
     }
 
     override fun onStart() {

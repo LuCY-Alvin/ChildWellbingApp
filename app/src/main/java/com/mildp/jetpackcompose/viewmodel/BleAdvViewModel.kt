@@ -25,18 +25,19 @@ class BleAdvViewModel(application: Application): AndroidViewModel(application)  
     private val mBluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
     private var advertisingCallback: AdvertiseCallback? = null
 
-    fun startAdvertise(mybroadcast: String) {
+    fun startAdvertise(myBroadcast: String) {
         if (advertisingCallback == null) {
+
             val bluetoothLeAdvertiser = mBluetoothAdapter?.bluetoothLeAdvertiser
             val advSettings = AdvertiseSettings.Builder()
                 .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
                 .setConnectable(false)
                 .build()
             val data = AdvertiseData.Builder()
-                .addServiceUuid(ParcelUuid.fromString(mybroadcast))
+                .addServiceUuid(ParcelUuid.fromString(myBroadcast))
                 .build()
             val scanResponse = AdvertiseData.Builder()
-                .setIncludeDeviceName(true)
+                .setIncludeDeviceName(false)
                 .build()
             advertisingCallback = createAdvertiseCallback()
 

@@ -51,7 +51,7 @@ class ForegroundService : Service(), MyListener {
 
     private val mReceiver = ScreenReceiver()
 
-    private var mybroadcast = ""
+    private var myBroadcast = ""
     private var partnerbroadcast = ""
 
     private var bleJob: Job = Job()
@@ -65,10 +65,10 @@ class ForegroundService : Service(), MyListener {
         super.onCreate()
         Helper().log(TAG,"Start Service @ ${Helper().timeString(Calendar.getInstance().timeInMillis)}")
 
-        mybroadcast = kv.decodeString("MyBroadcast","").toString()
+        myBroadcast = kv.decodeString("MyBroadcast","").toString()
         partnerbroadcast = kv.decodeString("PartnerBroadcast","").toString()
         val bandMac = kv.decodeString("bandMacSet","")
-        Helper().log(TAG,"我的廣播：$mybroadcast、伴侶的廣播：$partnerbroadcast")
+        Helper().log(TAG,"我的廣播：$myBroadcast、伴侶的廣播：$partnerbroadcast")
         Helper().log(TAG,"手環的廣播：$bandMac")
 
         NotificationListener().setListener(this)
@@ -132,7 +132,7 @@ class ForegroundService : Service(), MyListener {
     private fun repeatScanAndAdvertise(): Job {
         return  CoroutineScope(Dispatchers.IO + bleJob).launch {
             while(true) {
-                bleAdvViewModel.startAdvertise(mybroadcast)
+                bleAdvViewModel.startAdvertise(myBroadcast)
                 bleScanViewModel.startScan(partnerbroadcast)
                 delay(60 * 1000)
             }
@@ -150,16 +150,6 @@ class ForegroundService : Service(), MyListener {
 
 ////Check Permission and Devices Function/////
     private fun check() {
-
-        val bluetoothManager = App.instance().getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
-        val mBluetoothAdapter = bluetoothManager?.adapter
-        Helper().checkPermission(
-            mBluetoothAdapter?.isEnabled == false,
-            TAG,
-            "藍芽被關閉",
-            "BlueTooth",
-            NOTIFICATION_ID_BLUETOOTH
-        )
 
         val gpsManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         Helper().checkPermission(

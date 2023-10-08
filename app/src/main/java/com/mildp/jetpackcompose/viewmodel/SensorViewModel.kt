@@ -12,6 +12,9 @@ import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.database.AcceleratorData
 import com.mildp.jetpackcompose.model.database.GyroData
 import com.mildp.jetpackcompose.utils.Helper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -20,6 +23,8 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
         private const val TAG = "SensorViewModel"
     }
     private val sensorManager: SensorManager = application.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val databaseScope = CoroutineScope(Dispatchers.IO)
+
     private var acc: Sensor? = null
     private var gyro: Sensor? = null
 
@@ -47,6 +52,7 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
     fun stopSensors() {
         Helper().log(TAG,"Cancel Sensor")
         sensorManager.unregisterListener(sensorListener)
+        databaseScope.cancel()
     }
 
     private val sensorListener = object : SensorEventListener {
@@ -88,13 +94,13 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
     }
 
     private fun saveAcceleratorData(data: AcceleratorData) {
-        viewModelScope.launch {
+        databaseScope.launch {
             App.instance().dataDao.insertAccelerator(data)
         }
     }
 
     private fun saveGyroData(data: GyroData) {
-        viewModelScope.launch {
+        databaseScope.launch {
             App.instance().dataDao.insertGyro(data)
         }
     }

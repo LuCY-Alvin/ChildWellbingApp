@@ -1,5 +1,6 @@
 package com.mildp.jetpackcompose.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,10 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -21,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.utils.Constants
 import com.mildp.jetpackcompose.viewmodel.SettingViewModel
@@ -39,11 +38,13 @@ import java.time.format.DateTimeFormatter
 fun SettingScreen() {
     val scrollState = rememberScrollState()
     val settingViewModel: SettingViewModel = viewModel()
+    var showDialog by remember { mutableStateOf(false) }
 
     val phoneFound = Constants.kv.decodeBool("phoneFound", false)
     val mibandFound = Constants.kv.decodeBool("mibandFound", false)
 
     settingViewModel.checkPermission()
+    if(!settingViewModel.isMyServiceRunning(App.instance())) Toast.makeText(App.instance(),"實驗還沒開啟唷，請幫我到最下面按下紅色的開始實驗",Toast.LENGTH_SHORT).show()
 
     Surface(
         modifier = Modifier,
@@ -499,7 +500,7 @@ fun SettingScreen() {
                 )
                 Button(
                     onClick = {
-                        settingViewModel.resetUnfinishedAlarms()
+                        showDialog = true
                     },
                     modifier = Modifier.weight(1f),
                 ) {
@@ -508,6 +509,37 @@ fun SettingScreen() {
                         fontSize = 12.ssp,
                     )
                 }
+            }
+
+            if(showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = {
+                        Text(text = "確認是否要重置測驗")
+                    },
+                    text = {
+                        Text(text = "重置測驗會導致已經完成的測驗也重置，請您向實驗者確認您需要按下此按鍵。")
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showDialog = false
+                                settingViewModel.resetUnfinishedAlarms()
+                            }
+                        ) {
+                            Text(text = "實驗者已確認")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showDialog = false
+                            }
+                        ) {
+                            Text(text = "取消")
+                        }
+                    }
+                )
             }
 
             Text(
@@ -539,8 +571,8 @@ fun SettingScreen() {
                         settingViewModel.startMyProject()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ),
                     modifier = Modifier.weight(1f).padding(5.sdp),
                     enabled = !settingViewModel.isMyServiceRunning(App.instance())

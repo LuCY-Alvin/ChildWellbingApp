@@ -8,6 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Intent
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
@@ -337,10 +338,11 @@ class SettingViewModel: ViewModel() {
     fun startMyProject() {
         val bluetoothManager = App.instance().getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         val mBluetoothAdapter = bluetoothManager?.adapter
+        val gpsManager = App.instance().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val bandMacSet = kv.decodeString("bandMacSet", "")
 
-        if (mBluetoothAdapter?.isEnabled == false) {
-            Toast.makeText(App.instance(), "請先開啟藍芽再儲存設定", Toast.LENGTH_SHORT).show()
+        if (mBluetoothAdapter?.isEnabled == false || !gpsManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Toast.makeText(App.instance(), "請先開啟藍芽及GPS定位系統再儲存設定", Toast.LENGTH_SHORT).show()
         } else if (!isBatteryOptimizeClosed || !isAppUsageGranted || !isAccessibilityGranted || !isNotificationListenerGranted) {
             Toast.makeText(App.instance(), "請點擊設定開啟所有系統權限", Toast.LENGTH_SHORT).show()
         } else if (subID == "") {
@@ -393,5 +395,6 @@ class SettingViewModel: ViewModel() {
 
         val updatedAlarmStatusJson = Json.encodeToString(alarmStatus)
         kv.encode("alarmStatus", updatedAlarmStatusJson)
+        Toast.makeText(App.instance(),"已成功重置測驗，請到首頁確認",Toast.LENGTH_SHORT).show()
     }
 }

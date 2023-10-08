@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,7 +37,9 @@ import ir.kaaveh.sdpcompose.ssp
 
 
 class MainActivity : ComponentActivity() {
+
     private lateinit var navController: NavHostController
+    private var intentAction: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,11 +62,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        intent?.let {
-            when(it.action){
-                "setting" -> navController.navigate("setting")
-                "miband" -> navController.navigate("miband")
-            }
+        if(intent?.action == "startSurvey") {
+            val surveyIntent = Intent(this,SurveyActivity::class.java)
+            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            this.startActivity(surveyIntent)
+            finish()
         }
     }
 

@@ -109,7 +109,15 @@
         <receiver
             android:name=".receiver.CheckReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false">
+            <intent-filter>
+                <action android:name="GPS" />
+                <action android:name="Usage_Permission" />
+                <action android:name="Accessibility_Permission" />
+                <action android:name="Notification_Permission" />
+                <action android:name="Service_Stopped" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".receiver.Routine"
             android:enabled="true"
@@ -131,7 +139,7 @@
             android:name=".activity.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.JetpackCompose"
-            android:launchMode="singleTask">
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -142,7 +150,7 @@
             android:name=".activity.SurveyActivity"
             android:exported="true"
             android:theme="@style/Theme.JetpackCompose"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTop"/>
     </application>
 
 </manifest>
