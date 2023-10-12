@@ -19,7 +19,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.utils.Constants
 import com.mildp.jetpackcompose.viewmodel.SettingViewModel
@@ -81,11 +80,11 @@ fun SettingScreen() {
                 enabled = settingViewModel.isEditing.value
             )
 
-            Spacer(modifier = Modifier.padding(15.sdp))
+            Spacer(modifier = Modifier.padding(5.sdp))
 
             Text(
                 text = "實驗時間",
-                fontSize = 14.ssp,
+                fontSize = 12.ssp,
             )
 
             Spacer(modifier = Modifier.padding(5.sdp))
@@ -140,7 +139,6 @@ fun SettingScreen() {
                 }
             }
 
-
             Row(
                 modifier = Modifier
                     .padding(5.sdp),
@@ -152,7 +150,7 @@ fun SettingScreen() {
                         .weight(1f)
                         .fillMaxHeight(),
                     textAlign = TextAlign.Center,
-                    fontSize = 14.ssp,
+                    fontSize = 12.ssp,
                 )
                 Text(
                     text = "下午",
@@ -160,7 +158,7 @@ fun SettingScreen() {
                         .weight(1f)
                         .fillMaxHeight(),
                     textAlign = TextAlign.Center,
-                    fontSize = 14.ssp,
+                    fontSize = 12.ssp,
                 )
                 Text(
                     text = "晚上",
@@ -168,13 +166,13 @@ fun SettingScreen() {
                         .weight(1f)
                         .fillMaxHeight(),
                     textAlign = TextAlign.Center,
-                    fontSize = 14.ssp,
+                    fontSize = 12.ssp,
                 )
             }
 
             Row(
                 modifier = Modifier
-                    .padding(bottom = 10.sdp),
+                    .padding(bottom = 5.sdp),
             ) {
                 val formattedMorning by remember {
                     derivedStateOf {
@@ -328,6 +326,26 @@ fun SettingScreen() {
                 }
             }
 
+            Button(
+                onClick = {
+                    settingViewModel.onStoreOrEdit()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                modifier = Modifier.padding(5.sdp),
+            ) {
+                Text(
+                    text =
+                    if (settingViewModel.isEditing.value) "儲存設定"
+                    else "編輯設定",
+                    fontSize = 12.ssp
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(5.sdp))
+
             Text(
                 text = "本實驗將從手機後台持續蒐集資料\n，故請允許下方所有設定。",
                 textAlign = TextAlign.Center,
@@ -337,7 +355,7 @@ fun SettingScreen() {
                 )
             )
 
-            Spacer(modifier = Modifier.padding(10.sdp))
+            Spacer(modifier = Modifier.padding(5.sdp))
             
             Row(
                 modifier = Modifier,
@@ -465,44 +483,43 @@ fun SettingScreen() {
                 modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "開機自啟動",
-                    modifier = Modifier
-                        .weight(2f)
-                        .fillMaxSize(),
-                    textAlign = TextAlign.Center,
-                    fontSize = 12.ssp,
-                )
+                //Text(
+               //     text = "應用程式資訊",
+               //     modifier = Modifier
+               //         .weight(2f)
+               //         .fillMaxSize(),
+               //     textAlign = TextAlign.Center,
+               //     fontSize = 12.ssp,
+               // )
                 Button(
                     onClick = {
-                        settingViewModel.onBootCompletedClicked()
-                                 },
-                    modifier = Modifier.weight(1f),
+                        settingViewModel.onAppInformClicked()
+                    },
+                    modifier = Modifier.weight(1f).padding(2.sdp),
                 ) {
                     Text(
-                        text = "前往",
+                        text = "App資訊",
                         fontSize = 12.ssp,
                     )
                 }
-            }
 
-            Row(
-                modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "請依照實驗者指示再使用",
-                    modifier = Modifier
-                        .weight(2f)
-                        .fillMaxSize(),
-                    textAlign = TextAlign.Center,
-                    fontSize = 12.ssp,
-                )
+                Button(
+                    onClick = {
+                        settingViewModel.onBootCompletedClicked()
+                    },
+                    modifier = Modifier.weight(1f).padding(2.sdp),
+                ) {
+                    Text(
+                        text = "自啟動",
+                        fontSize = 12.ssp,
+                    )
+                }
+
                 Button(
                     onClick = {
                         showDialog = true
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).padding(2.sdp),
                 ) {
                     Text(
                         text = "測驗重置",
@@ -542,46 +559,32 @@ fun SettingScreen() {
                 )
             }
 
+            Spacer(modifier = Modifier.padding(5.sdp))
+
             Text(
-                text = "確認上方資料都沒有問題後\n請您按下儲存",
+                text = "確認上方資料都沒有問題後\n請您按下開始",
                 textAlign = TextAlign.Center,
                 fontSize = 12.ssp
             )
 
             Spacer(modifier = Modifier.padding(5.sdp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Button(
+                onClick = {
+                    settingViewModel.startMyProject() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                ),
+                modifier = Modifier.padding(5.sdp),
+                enabled = !settingViewModel.isMyServiceRunning(App.instance())
             ) {
-                Button(
-                    onClick = {
-                        settingViewModel.onStoreOrEdit()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ),
-                    modifier = Modifier.weight(1f).padding(5.sdp),
-                ) {
-                    Text(text = if (settingViewModel.isEditing.value) "儲存設定" else "編輯設定")
-                }
-
-                Button(
-                    onClick = {
-                        settingViewModel.startMyProject()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    ),
-                    modifier = Modifier.weight(1f).padding(5.sdp),
-                    enabled = !settingViewModel.isMyServiceRunning(App.instance())
-                ) {
-                    Text(text =
-                        if (!settingViewModel.isMyServiceRunning(App.instance())) "開始實驗"
-                        else "實驗進行中"
-                    )
-                }
+                Text(
+                    text =
+                    if (!settingViewModel.isMyServiceRunning(App.instance())) "開始實驗"
+                    else "實驗進行中",
+                    fontSize = 12.ssp
+                )
             }
 
             if(!phoneFound || !mibandFound) {

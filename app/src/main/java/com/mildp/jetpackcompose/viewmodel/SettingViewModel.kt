@@ -257,6 +257,14 @@ class SettingViewModel: ViewModel() {
         }
     }
 
+    fun onAppInformClicked() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", App.instance().packageName, null)
+        intent.data = uri
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        App.instance().startActivity(intent)
+    }
+
     @OptIn(ExperimentalSerializationApi::class)
     fun onStoreOrEdit() {
         if(isEditing.value) {
