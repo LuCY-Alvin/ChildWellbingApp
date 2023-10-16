@@ -59,6 +59,9 @@ class NotificationHelper(private val context: Context) {
             .setCustomContentView(notificationLayout)
             .setColor(Color.YELLOW)
             .setColorized(true)
+            .setPriority(2)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setTimeoutAfter(2 * 60 * 60 * 1000)
             .build()
 
         notificationManager.notify(Constants.NOTIFICATION_ID2,notification)

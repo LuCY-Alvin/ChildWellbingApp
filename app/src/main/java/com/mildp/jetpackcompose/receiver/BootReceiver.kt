@@ -25,7 +25,7 @@ class BootReceiver : BroadcastReceiver() {
 
         Helper().log(TAG,"Boot Completed")
 
-        if (Intent.ACTION_BOOT_COMPLETED == intent.action || Intent.ACTION_USER_PRESENT == intent.action) {
+        if (Intent.ACTION_BOOT_COMPLETED == intent.action) {
             resetUnfinishedAlarms()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(Intent(context, ForegroundService::class.java))

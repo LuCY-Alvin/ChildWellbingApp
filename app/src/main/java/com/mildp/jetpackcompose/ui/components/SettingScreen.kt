@@ -43,7 +43,9 @@ fun SettingScreen() {
     val mibandFound = Constants.kv.decodeBool("mibandFound", false)
 
     settingViewModel.checkPermission()
-    if(!settingViewModel.isMyServiceRunning(App.instance())) Toast.makeText(App.instance(),"實驗還沒開啟唷，請幫我到最下面按下紅色的開始實驗",Toast.LENGTH_SHORT).show()
+    if(!settingViewModel.isMyServiceRunning(App.instance())) {
+        Toast.makeText(App.instance(), "實驗還沒開啟唷，請幫我到最下面按下紅色的開始實驗", Toast.LENGTH_SHORT).show()
+    }
 
     Surface(
         modifier = Modifier,
@@ -82,68 +84,19 @@ fun SettingScreen() {
 
             Spacer(modifier = Modifier.padding(5.sdp))
 
-            Text(
-                text = "實驗時間",
-                fontSize = 12.ssp,
-            )
-
-            Spacer(modifier = Modifier.padding(5.sdp))
-
-            val formattedDate by remember {
-                derivedStateOf {
-                    DateTimeFormatter
-                        .ofPattern("yyyy年MM月dd日")
-                        .format(settingViewModel.pickedDate)
-                }
-            }
-            val dateDialogState = rememberMaterialDialogState()
-
-            Button(
-                onClick = { dateDialogState.show() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                enabled = settingViewModel.isEditing.value
-            ) {
-                Text(
-                    text = formattedDate,
-                    fontSize = 12.ssp,
-                )
-            }
-            MaterialDialog(
-                dialogState = dateDialogState,
-                buttons = {
-                    positiveButton(text = "確認", textStyle = TextStyle(color = MaterialTheme.colorScheme.onSecondaryContainer))
-                    negativeButton(text = "取消", textStyle = TextStyle(color = MaterialTheme.colorScheme.onErrorContainer))
-                },
-                backgroundColor = MaterialTheme.colorScheme.background
-            ) {
-                datepicker(
-                    initialDate = settingViewModel.pickedDate,
-                    title = "選擇開始實驗的日期",
-                    allowedDateValidator = {
-                        it >= LocalDate.now()
-                    },
-                    colors = DatePickerDefaults.colors(
-                        headerBackgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        headerTextColor = MaterialTheme.colorScheme.primaryContainer,
-                        calendarHeaderTextColor = MaterialTheme.colorScheme.onBackground,
-                        dateActiveBackgroundColor = MaterialTheme.colorScheme.primary,
-                        dateActiveTextColor = MaterialTheme.colorScheme.onPrimary,
-                        dateInactiveBackgroundColor = MaterialTheme.colorScheme.background,
-                        dateInactiveTextColor = MaterialTheme.colorScheme.onBackground
-                    )
-                ) {
-                    settingViewModel.pickedDate = it
-                }
-            }
-
             Row(
                 modifier = Modifier
                     .padding(5.sdp),
                horizontalArrangement = Arrangement.Center,
             ) {
+                Text(
+                    text = "實驗時間",
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 12.ssp,
+                )
                 Text(
                     text = "早上",
                     modifier = Modifier
@@ -174,6 +127,61 @@ fun SettingScreen() {
                 modifier = Modifier
                     .padding(bottom = 5.sdp),
             ) {
+                val formattedDate by remember {
+                    derivedStateOf {
+                        DateTimeFormatter
+                            .ofPattern("MM/dd")
+                            .format(settingViewModel.pickedDate)
+                    }
+                }
+                val dateDialogState = rememberMaterialDialogState()
+
+                Button(
+                    onClick = { dateDialogState.show() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(2.sdp),
+                    enabled = settingViewModel.isEditing.value
+                ) {
+                    Text(
+                        text = formattedDate,
+                        fontSize = 10.ssp,
+                    )
+                }
+                MaterialDialog(
+                    dialogState = dateDialogState,
+                    buttons = {
+                        positiveButton(text = "確認", textStyle = TextStyle(color = MaterialTheme.colorScheme.onSecondaryContainer))
+                        negativeButton(text = "取消", textStyle = TextStyle(color = MaterialTheme.colorScheme.onErrorContainer))
+                    },
+                    backgroundColor = MaterialTheme.colorScheme.background
+                ) {
+                    datepicker(
+                        initialDate = settingViewModel.pickedDate,
+                        title = "選擇開始實驗的日期",
+                        allowedDateValidator = {
+                            it >= LocalDate.now()
+                        },
+                        colors = DatePickerDefaults.colors(
+                            headerBackgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            headerTextColor = MaterialTheme.colorScheme.primaryContainer,
+                            calendarHeaderTextColor = MaterialTheme.colorScheme.onBackground,
+                            dateActiveBackgroundColor = MaterialTheme.colorScheme.primary,
+                            dateActiveTextColor = MaterialTheme.colorScheme.onPrimary,
+                            dateInactiveBackgroundColor = MaterialTheme.colorScheme.background,
+                            dateInactiveTextColor = MaterialTheme.colorScheme.onBackground
+                        )
+                    ) {
+                        settingViewModel.pickedDate = it
+                    }
+                }
+
+
                 val formattedMorning by remember {
                     derivedStateOf {
                         DateTimeFormatter
@@ -187,7 +195,7 @@ fun SettingScreen() {
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .padding(5.sdp),
+                        .padding(2.sdp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -196,7 +204,7 @@ fun SettingScreen() {
                 ) {
                     Text(
                         text = formattedMorning,
-                        fontSize = 12.ssp,
+                        fontSize = 10.ssp,
                     )
                 }
                 MaterialDialog(
@@ -237,7 +245,7 @@ fun SettingScreen() {
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .padding(5.sdp),
+                        .padding(2.sdp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -246,7 +254,7 @@ fun SettingScreen() {
                 ) {
                     Text(
                         text = formattedAfternoon,
-                        fontSize = 12.ssp,
+                        fontSize = 10.ssp,
 
                         )
                 }
@@ -288,7 +296,7 @@ fun SettingScreen() {
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .padding(5.sdp),
+                        .padding(2.sdp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -297,7 +305,7 @@ fun SettingScreen() {
                 ) {
                     Text(
                         text = formattedNight,
-                        fontSize = 12.ssp,
+                        fontSize = 10.ssp,
                     )
                 }
                 MaterialDialog(
@@ -330,10 +338,18 @@ fun SettingScreen() {
                 onClick = {
                     settingViewModel.onStoreOrEdit()
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
+                colors =
+                if (settingViewModel.isEditing.value)
+                    ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                else
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ,
                 modifier = Modifier.padding(5.sdp),
             ) {
                 Text(

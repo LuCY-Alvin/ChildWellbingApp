@@ -1,16 +1,20 @@
 package com.mildp.jetpackcompose.viewmodel
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.ParcelUuid
 import android.os.SystemClock
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -41,7 +45,7 @@ class BleScanViewModel(application: Application): AndroidViewModel(application) 
         get() = _scannedDevices
 
     init {
-        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled) {
+        if (mBluetoothAdapter?.isEnabled == false) {
             Toast.makeText(application.applicationContext,"請重新開啟藍芽",Toast.LENGTH_SHORT).show()
         }
     }

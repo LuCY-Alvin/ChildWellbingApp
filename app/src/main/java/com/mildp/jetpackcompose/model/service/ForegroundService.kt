@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.ActivityRecognition
@@ -158,6 +160,16 @@ class ForegroundService : Service(), MyListener {
             "GPS被關閉",
             "GPS",
             NOTIFICATION_ID_GPS
+        )
+
+        val bluetoothManager: BluetoothManager = application.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val mBluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+        Helper().checkPermission(
+            mBluetoothAdapter?.isEnabled == false,
+            TAG,
+            "藍芽被關閉",
+            "BlueTooth",
+            NOTIFICATION_ID_BLUETOOTH
         )
 
         Helper().permissionCheck(App.instance(), TAG,"appUsage")
