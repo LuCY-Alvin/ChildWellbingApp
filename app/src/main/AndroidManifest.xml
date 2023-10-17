@@ -111,7 +111,6 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="GPS" />
-                <action android:name="BlueTooth"/>
                 <action android:name="Usage_Permission" />
                 <action android:name="Accessibility_Permission" />
                 <action android:name="Notification_Permission" />

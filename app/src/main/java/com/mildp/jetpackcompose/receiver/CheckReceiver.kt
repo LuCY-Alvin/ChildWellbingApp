@@ -15,7 +15,6 @@ class CheckReceiver : BroadcastReceiver() {
     companion object {
         private const val TAG: String = "CheckReceiver"
         private const val CHANNEL_ID = "CheckStatusChannel"
-        private const val NOTIFICATION_ID_BLUETOOTH = 24
         private const val NOTIFICATION_ID_GPS = 25
         private const val NOTIFICATION_ID_USAGE = 26
         private const val NOTIFICATION_ID_ACCESSIBILITY = 27
@@ -34,11 +33,6 @@ class CheckReceiver : BroadcastReceiver() {
             .setSmallIcon(R.drawable.warning_hint_notification)
 
         when (intent.action) {
-            "BlueTooth" -> {
-                notification.setContentText("由於實驗需求，盼請您開啟藍芽，以求資料完整。重新設定後可以直接滑掉此通知。")
-                checkManager.notify(NOTIFICATION_ID_BLUETOOTH, notification.build())
-                Helper().log(TAG, "未打開藍芽")
-            }
             "GPS" -> {
                 notification.setContentText("由於實驗需求，盼請您開啟GPS，以求資料完整。重新設定後可以直接滑掉此通知。")
                 checkManager.notify(NOTIFICATION_ID_GPS, notification.build())

@@ -38,7 +38,6 @@ class ForegroundService : Service(), MyListener {
 
     companion object {
         private const val TAG: String = "ForegroundService"
-        private const val NOTIFICATION_ID_BLUETOOTH = 24
         private const val NOTIFICATION_ID_GPS = 25
         private const val NOTIFICATION_ID_USAGE = 26
         private const val NOTIFICATION_ID_ACCESSIBILITY = 27
@@ -160,16 +159,6 @@ class ForegroundService : Service(), MyListener {
             "GPS被關閉",
             "GPS",
             NOTIFICATION_ID_GPS
-        )
-
-        val bluetoothManager: BluetoothManager = application.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val mBluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
-        Helper().checkPermission(
-            mBluetoothAdapter?.isEnabled == false,
-            TAG,
-            "藍芽被關閉",
-            "BlueTooth",
-            NOTIFICATION_ID_BLUETOOTH
         )
 
         Helper().permissionCheck(App.instance(), TAG,"appUsage")
