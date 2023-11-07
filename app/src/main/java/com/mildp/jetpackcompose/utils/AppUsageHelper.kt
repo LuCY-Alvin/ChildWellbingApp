@@ -25,6 +25,7 @@ class AppUsageHelper {
         val packageManager = App.instance().packageManager
         val events: LinkedList<EventTypeData> = LinkedList()
 
+        startDay.add(Calendar.DAY_OF_YEAR, -7)
         startDay.set(Calendar.HOUR_OF_DAY, 0)
         startDay.set(Calendar.MINUTE, 0)
         startDay.set(Calendar.SECOND, 1)

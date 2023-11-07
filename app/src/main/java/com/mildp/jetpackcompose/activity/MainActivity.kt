@@ -26,12 +26,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.mildp.jetpackcompose.ui.components.HomeScreen
 import com.mildp.jetpackcompose.ui.components.MibandScreen
 import com.mildp.jetpackcompose.ui.components.SettingScreen
 import com.mildp.jetpackcompose.ui.components.UploadScreen
 import com.mildp.jetpackcompose.ui.theme.AppTheme
 import com.mildp.jetpackcompose.utils.Constants
+import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
 import ir.kaaveh.sdpcompose.ssp
 
@@ -39,7 +42,6 @@ import ir.kaaveh.sdpcompose.ssp
 class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
-    private var intentAction: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +60,12 @@ class MainActivity : ComponentActivity() {
         }
         onPermissionGranted()
         Helper().myWorkManager()
+
+        val subID = kv.decodeString("subID", null)
+
+        if(subID != null){
+            Firebase.crashlytics.setUserId(subID)
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {

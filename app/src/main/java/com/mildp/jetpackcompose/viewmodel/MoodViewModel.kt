@@ -35,7 +35,7 @@ import java.util.*
 class MoodViewModel : ViewModel() {
 
     companion object {
-        private const val TAG = ""
+        private const val TAG = "MoodScreen"
     }
 
     private val _selectedImageId = mutableStateOf(R.drawable._13)
@@ -54,48 +54,11 @@ class MoodViewModel : ViewModel() {
     }
 
     fun onAppUsageData() {
-
         moodData = MoodData(
             Helper().databaseDay(), participant,
             0, 0,
             Helper().timeString(System.currentTimeMillis()), System.currentTimeMillis()
         )
-
-        val currentTime = LocalTime.now()
-        if(participant == "家長" && currentTime in LocalTime.of(19, 0)..LocalTime.of(23, 59)) {
-            if(checkPermission()) {
-                try {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        for (stats in AppUsageHelper().getDailyAppUsage(Calendar.getInstance())){
-                            val usageData = UsageData(Helper().databaseDay(),stats.app, stats.category, stats.startTimeString,stats.endTimeString)
-                            App.instance().dataDao.insertUsage(usageData)
-                        }
-                    }
-                } catch (e:Exception) {
-                    Helper().log(TAG,"Get App Usage failed: $e")
-                }
-            } else {
-                Helper().log(TAG,"There's App Usage permission issues.")
-            }
-        }
-    }
-
-    private fun checkPermission(): Boolean {
-        val appOpsManager = App.instance().getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            appOpsManager.unsafeCheckOpNoThrow(
-                "android:get_usage_stats",
-                android.os.Process.myUid(), App.instance().packageName
-            )
-        }
-        else {
-            @Suppress("DEPRECATION")
-            appOpsManager.checkOpNoThrow(
-                "android:get_usage_stats",
-                android.os.Process.myUid(), App.instance().packageName
-            )
-        }
-        return mode == AppOpsManager.MODE_ALLOWED
     }
 
     fun onEmojiSelected(imageId: Int, imageContent: Pair<Int,Int>) {
@@ -110,8 +73,6 @@ class MoodViewModel : ViewModel() {
     @OptIn(ExperimentalSerializationApi::class)
     fun onDoneSurvey(){
         if(participant == "家長") {
-            val currentTime = LocalTime.now()
-
             notificationManager.cancel(Constants.NOTIFICATION_ID2)
             kv.encode("surveyCancelled", true)
 
@@ -126,22 +87,13 @@ class MoodViewModel : ViewModel() {
                 kv.encode("alarmStatus", updatedAlarmStatusJson)
             }
 
-            if (currentTime in LocalTime.of(19, 0)..LocalTime.of(23, 59)) {
-                kv.encode("uploadServiceReady", true)
-                Helper().log(TAG,"Upload Ready!!")
+            kv.encode("uploadServiceReady", true)
 
-                val intent = Intent(App.instance(),SurveyActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.action = "goBackMain"
-                App.instance().startActivity(intent)
-                Toast.makeText(App.instance(),"感謝完成今日測驗，準備上傳今日資料，也請記得同步手環資料",Toast.LENGTH_SHORT).show()
-            } else {
-                val intent = Intent(App.instance(), SurveyActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.action = "goBackMain"
-                App.instance().startActivity(intent)
-                Toast.makeText(App.instance(),"感謝完成本次測驗",Toast.LENGTH_SHORT).show()
-            }
+            val intent = Intent(App.instance(), SurveyActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.action = "goBackMain"
+            App.instance().startActivity(intent)
+            Toast.makeText(App.instance(),"感謝完成本次測驗，準備上傳資料，也請記得同步手環",Toast.LENGTH_SHORT).show()
 
         } else {
 

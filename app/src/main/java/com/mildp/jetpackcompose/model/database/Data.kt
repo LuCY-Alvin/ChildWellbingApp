@@ -158,14 +158,11 @@ data class AcceleratorData(
     @ColumnInfo(name = "Z")
     var Z: Float? =0f,
 
-    @ColumnInfo(name = "TimeStamp")
-    var Time: String = "",
-
     @ColumnInfo(name = "TimeInMillis")
-    var MilliSeconds: Long = 0
+    var MilliSeconds: Long? = 0
 ){
-    constructor(Day:Int, X: Float?, Y: Float?, Z: Float?, Time: String, MilliSeconds: Long)
-            : this(0, Day ,X, Y, Z, Time, MilliSeconds)
+    constructor(Day:Int, X: Float?, Y: Float?, Z: Float?, MilliSeconds: Long?)
+            : this(0, Day ,X, Y, Z,  MilliSeconds)
 }
 
 @Entity(tableName = "GyroData")
@@ -186,14 +183,11 @@ data class GyroData(
     @ColumnInfo(name = "Z")
     var Z: Float? =0f,
 
-    @ColumnInfo(name = "TimeStamp")
-    var Time: String = "",
-
     @ColumnInfo(name = "TimeInMillis")
-    var MilliSeconds: Long = 0
+    var MilliSeconds: Long? = 0
 ){
-    constructor(Day:Int, X: Float?, Y: Float?, Z: Float?, Time: String, MilliSeconds: Long)
-            : this(0, Day ,X, Y, Z, Time, MilliSeconds)
+    constructor(Day:Int, X: Float?, Y: Float?, Z: Float?,  MilliSeconds: Long?)
+            : this(0, Day ,X, Y, Z, MilliSeconds)
 }
 
 @Entity(tableName = "TMTData")

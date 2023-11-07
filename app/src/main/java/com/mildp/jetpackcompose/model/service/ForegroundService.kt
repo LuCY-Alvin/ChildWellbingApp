@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.Intent
@@ -14,7 +13,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.ActivityRecognition
@@ -103,6 +101,12 @@ class ForegroundService : Service(), MyListener {
 
         bleJob = repeatScanAndAdvertise()
         checkPermissionJob = repeatCheckPermission()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(1 * 60 * 60 *1000)
+            Helper().log(TAG,"Ready to start Upload a file for 1 hr.")
+            startService(Intent(this@ForegroundService, UploadService::class.java))
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -194,10 +198,27 @@ class ForegroundService : Service(), MyListener {
 
 ////ActivityRecognition Function/////
     private fun startActivityRecognitionTask() {
-        if (ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACTIVITY_RECOGNITION
-        ) == PackageManager.PERMISSION_GRANTED) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(
+
+                    this,
+                    Manifest.permission.ACTIVITY_RECOGNITION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                val task = activityRecognitionClient.requestActivityUpdates(
+                    10000L,
+                    getActivityRecognitionPendingIntent()
+                )
+                task.addOnSuccessListener {
+                    Helper().log(TAG, "Activity recognition started")
+                }
+                task.addOnFailureListener {
+                    Helper().log(TAG, "Activity recognition request failed: $it")
+                }
+            } else {
+                Helper().log(TAG, "Is Activity recognition permission granted?")
+            }
+        } else {
             val task = activityRecognitionClient.requestActivityUpdates(
                 10000L,
                 getActivityRecognitionPendingIntent()
@@ -208,8 +229,6 @@ class ForegroundService : Service(), MyListener {
             task.addOnFailureListener {
                 Helper().log(TAG, "Activity recognition request failed: $it")
             }
-        } else {
-            Helper().log(TAG, "Is Activity recognition permission granted?")
         }
     }
 

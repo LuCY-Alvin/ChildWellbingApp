@@ -7,7 +7,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.database.AcceleratorData
 import com.mildp.jetpackcompose.model.database.GyroData
@@ -16,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import java.util.*
+
 
 class SensorViewModel(application: Application): AndroidViewModel(application) {
     companion object {
@@ -61,47 +60,35 @@ class SensorViewModel(application: Application): AndroidViewModel(application) {
             val alpha = values?.get(0)
             val beta = values?.get(1)
             val gamma = values?.get(2)
-            val milliseconds = Calendar.getInstance().timeInMillis
+            val milliseconds = System.currentTimeMillis()
 
             if (event != null) {
-                if (event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION || event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                    val acceleratorData = AcceleratorData(
-                        Helper().databaseDay(),
-                        alpha,
-                        beta,
-                        gamma,
-                        Helper().timeString(milliseconds),
-                        milliseconds
-                    )
-                    saveAcceleratorData(acceleratorData)
-                } else {
-                    val gyroData = GyroData(
-                        Helper().databaseDay(),
-                        alpha,
-                        beta,
-                        gamma,
-                        Helper().timeString(milliseconds),
-                        milliseconds
-                    )
-                    saveGyroData(gyroData)
+                databaseScope.launch {
+                    if (event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION || event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+                        val acceleratorData = AcceleratorData(
+                            Helper().databaseDay(),
+                            alpha,
+                            beta,
+                            gamma,
+                            milliseconds
+                        )
+                        App.instance().dataDao.insertAccelerator(acceleratorData)
+                    } else {
+                        val gyroData = GyroData(
+                            Helper().databaseDay(),
+                            alpha,
+                            beta,
+                            gamma,
+                            milliseconds
+                        )
+                        App.instance().dataDao.insertGyro(gyroData)
+                    }
                 }
             }
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             // do function when sensor accuracy changed
-        }
-    }
-
-    private fun saveAcceleratorData(data: AcceleratorData) {
-        databaseScope.launch {
-            App.instance().dataDao.insertAccelerator(data)
-        }
-    }
-
-    private fun saveGyroData(data: GyroData) {
-        databaseScope.launch {
-            App.instance().dataDao.insertGyro(data)
         }
     }
 

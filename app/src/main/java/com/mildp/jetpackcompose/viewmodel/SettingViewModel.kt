@@ -41,7 +41,7 @@ class SettingViewModel: ViewModel() {
         private const val TAG: String = "SettingsPage"
     }
 
-    var subID by mutableStateOf(kv.decodeString("subID","").toString())
+    var subID by mutableStateOf(kv.decodeString("subID",null).toString())
 
     private val _isEditing = mutableStateOf(kv.decodeBool("edit",true))
     val isEditing: State<Boolean> = _isEditing

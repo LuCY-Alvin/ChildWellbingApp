@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import com.mildp.jetpackcompose.App
 import com.mildp.jetpackcompose.model.service.ForegroundService
 import com.mildp.jetpackcompose.model.service.UploadService
@@ -35,11 +36,21 @@ class Routine : BroadcastReceiver() {
             }
             return false
         }
+
+        fun isMyServiceRunning(context: Context): Boolean {
+            val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val services = manager.getRunningServices(Integer.MAX_VALUE)
+            for (service in services) {
+                if (ForegroundService::class.java.name == service.service.className) {
+                    return true
+                }
+            }
+            return false
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            val success = kv.decodeBool("uploadServiceReady", false)
 
             if (AppRunning.isAppRunning(context)) {
                 Helper().log(TAG, "App is alive, nothing happened now")
@@ -48,8 +59,19 @@ class Routine : BroadcastReceiver() {
                 startNewActivity(context)
             }
 
-            Helper().log(TAG,"Upload status: $success")
+            if (AppRunning.isMyServiceRunning(context)){
+                Helper().log(TAG, "Service is alive, nothing happened now")
+            } else {
+                Helper().log(TAG, "Service is dead, restart Service now")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    App.instance().startForegroundService(Intent(App.instance(), ForegroundService::class.java))
+                } else {
+                    App.instance().startService(Intent(App.instance(), ForegroundService::class.java))
+                }
+            }
 
+            val success = kv.decodeBool("uploadServiceReady", false)
+            Helper().log(TAG,"Upload status: $success")
             if (success) {
                 Helper().log(TAG, "Start Upload Service")
                 context.startService(Intent(context, UploadService::class.java))
