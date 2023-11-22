@@ -87,6 +87,7 @@ class NotificationHelper(private val context: Context) {
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .setContentIntent(pendingIntent)
+            .setOngoing(true)
             .build()
 
         service.startForeground(Constants.NOTIFICATION_ID, notification)
