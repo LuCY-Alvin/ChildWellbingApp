@@ -185,6 +185,8 @@ class Helper {
                     val updatedAlarmStatusJson = Json.encodeToString(alarmStatus)
                     kv.encode("alarmStatus", updatedAlarmStatusJson)
                 }
+
+                kv.encode("uploadServiceReady", true)
             } else {
                 log(TAG, "通知已取消 @ ${System.currentTimeMillis()}")
             }

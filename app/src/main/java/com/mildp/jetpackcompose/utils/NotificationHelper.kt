@@ -3,13 +3,18 @@ package com.mildp.jetpackcompose.utils
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.graphics.Color
 import android.os.Build
 import android.widget.RemoteViews
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import com.mildp.jetpackcompose.R
 import com.mildp.jetpackcompose.activity.MainActivity
 import com.mildp.jetpackcompose.utils.Constants.CHANNEL_ID2
+import com.mildp.jetpackcompose.utils.Constants.NOTIFICATION_ID
 import com.mildp.jetpackcompose.utils.Constants.kv
 
 class NotificationHelper(private val context: Context) {
@@ -90,7 +95,16 @@ class NotificationHelper(private val context: Context) {
             .setOngoing(true)
             .build()
 
-        service.startForeground(Constants.NOTIFICATION_ID, notification)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ServiceCompat.startForeground(
+                service,
+                NOTIFICATION_ID,
+                notification,
+                FOREGROUND_SERVICE_TYPE_LOCATION and FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+            )
+        } else {
+            service.startForeground(NOTIFICATION_ID, notification)
+        }
     }
 
 }
