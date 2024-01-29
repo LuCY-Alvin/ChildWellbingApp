@@ -11,10 +11,16 @@ class Worker (context: Context, params: WorkerParameters) :
     Worker(context, params) {
 
     override fun doWork(): Result {
-        val i = Intent(App.instance(), Routine::class.java)
-        i.action = "doRoutine"
-        App.instance().sendBroadcast(i)
+        return try {
+            val i = Intent(App.instance(), Routine::class.java)
+            i.action = "doRoutine"
+            App.instance().sendBroadcast(i)
 
-        return Result.success()
+            Result.success()
+        } catch (e: Exception) {
+            Helper().log("Worker", e.toString())
+
+            Result.failure()
+        }
     }
 }

@@ -69,7 +69,8 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType= "location|connectedDevice"
-            android:persistent="true" />
+            android:persistent="true" >
+        </service>
         <service
             android:name=".model.service.UploadService"
             android:enabled="true"

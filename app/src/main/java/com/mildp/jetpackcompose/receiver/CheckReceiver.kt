@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.mildp.jetpackcompose.R
+import com.mildp.jetpackcompose.utils.Constants.CHANNEL_ID4
 import com.mildp.jetpackcompose.utils.Helper
 import com.mildp.jetpackcompose.utils.NotificationHelper
 
@@ -14,7 +15,6 @@ class CheckReceiver : BroadcastReceiver() {
     private lateinit var checkManager: NotificationManager
     companion object {
         private const val TAG: String = "CheckReceiver"
-        private const val CHANNEL_ID = "CheckStatusChannel"
         private const val NOTIFICATION_ID_GPS = 25
         private const val NOTIFICATION_ID_USAGE = 26
         private const val NOTIFICATION_ID_ACCESSIBILITY = 27
@@ -26,9 +26,9 @@ class CheckReceiver : BroadcastReceiver() {
 
         checkManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationHelper = NotificationHelper(context)
-        notificationHelper.createNotificationChannel(CHANNEL_ID, "CheckStatus", NotificationManager.IMPORTANCE_HIGH)
+        notificationHelper.createNotificationChannel(CHANNEL_ID4, "CheckStatus", NotificationManager.IMPORTANCE_HIGH)
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID4)
             .setContentTitle("您有尚未打開的設備，請您檢查以下功能是否開啟")
             .setSmallIcon(R.drawable.warning_hint_notification)
 

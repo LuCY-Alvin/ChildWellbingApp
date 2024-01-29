@@ -83,7 +83,7 @@ class HomeViewModel: ViewModel() {
         val calendar: Calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_YEAR, 1)
         calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 1)
+        calendar.set(Calendar.MINUTE, 0)
 
         val pendingIntent =
             PendingIntent.getBroadcast(App.instance(), calendar.timeInMillis.toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE)

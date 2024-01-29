@@ -18,6 +18,8 @@ object Constants {
     const val NOTIFICATION_ID2 = 154
     const val CHANNEL_ID3 = "Upload"
     const val NOTIFICATION_ID3 = 455
+    const val CHANNEL_ID4 = "CheckNotification"
+
 
     val BottomNavItems = listOf(
         BottomNavItem(

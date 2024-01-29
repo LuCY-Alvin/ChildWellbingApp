@@ -91,7 +91,7 @@ class ForegroundService : Service(), MyListener {
         val notificationHelper = NotificationHelper(this)
 
         try {
-            notificationHelper.createNotificationChannel(CHANNEL_ID, "MY SERVICE", NotificationManager.IMPORTANCE_LOW)
+            notificationHelper.createNotificationChannel(CHANNEL_ID, "MY SERVICE", NotificationManager.IMPORTANCE_HIGH)
             notificationHelper.showBleNotification(this)
             initBlueAdapter()
             Helper().log(TAG,"Service: Initiate notification and adapter")

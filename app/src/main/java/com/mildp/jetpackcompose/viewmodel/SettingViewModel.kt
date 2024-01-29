@@ -8,7 +8,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Intent
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Build

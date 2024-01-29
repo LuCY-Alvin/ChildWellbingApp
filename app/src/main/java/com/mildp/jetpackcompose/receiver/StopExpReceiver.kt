@@ -14,6 +14,7 @@ import com.mildp.jetpackcompose.utils.Constants.kv
 import com.mildp.jetpackcompose.utils.Helper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -38,12 +39,15 @@ class StopExpReceiver : BroadcastReceiver() {
             Helper().log(TAG,"There's App Usage permission issues.")
         }
 
-        val stopIntent = Intent(context,ForegroundService::class.java)
-        stopIntent.action = "stopExp"
-        kv.encode("stopExp",true)
-        context.stopService(stopIntent)
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(10*60*1000)
+            val stopIntent = Intent(context, ForegroundService::class.java)
+            stopIntent.action = "stopExp"
+            kv.encode("stopExp", true)
+            context.stopService(stopIntent)
 
-        context.startService(Intent(context, UploadService::class.java))
+            context.startService(Intent(context, UploadService::class.java))
+        }
     }
 
     private fun checkPermission(): Boolean {
