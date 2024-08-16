@@ -22,7 +22,7 @@
 - 適用的 Android 最低版本：API 24 (Android 7.0 Nougat)
   
 ### 步驟
-- 透過 git clone https://github.com/LuCY-Alvin/ChildrensWellbeingProject 
+- 透過 git clone https://github.com/LuCY-Alvin/ChildWellbeingApp 
 - 在 Android Studio 中開啟，並同步安裝需要的 dependencies 和 plugins
   
 ### 使用方法
